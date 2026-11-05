@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro Checkout</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* Demo checkout. Two halves: the order on the left, the form on the right. */
+  :root { --left: #f5f5f7; --right: #ffffff; --field: #fff; --field-line: rgba(0,0,0,.14) }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --left: #1c1c1e; --right: #111112; --field: #161618; --field-line: rgba(255,255,255,.12) } }
+  :root[data-theme="dark"] { --left: #1c1c1e; --right: #111112; --field: #161618; --field-line: rgba(255,255,255,.12) }
+  body { min-height: 100vh; display: flex; flex-direction: column; background: var(--right) }
+  .demo { background: color-mix(in oklab, var(--warn) 18%, var(--right)); color: var(--fg); font-size: 13px; text-align: center; padding: 8px 16px; border-bottom: 1px solid var(--line) }
+  .demo b { color: var(--warn) }
+  .co { flex: 1; display: grid; grid-template-columns: 1fr 1fr }
+  .co-l { background: var(--left); display: flex; flex-direction: column; padding: 64px clamp(16px, 7vw, 120px) 28px; position: relative }
+  .co-r { background: var(--right); padding: 64px clamp(16px, 7vw, 120px) 40px }
+  .co-l > .in, .co-r > .in { max-width: 560px; width: 100%; margin-left: auto }
+  .co-r > .in { margin: 0 auto 0 0 }
+  @media (max-width: 900px) { .co { grid-template-columns: 1fr } .co-l, .co-r { padding: 32px 16px } .co-l > .in, .co-r > .in { margin: 0 auto } .co-l .tools { position: static; margin-top: 24px } }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 44px }
+  .brand { font-size: 17px }
+  .dd { position: relative }
+  .ddb { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: var(--right); border: 1px solid var(--field-line); color: var(--fg); font: 600 14px var(--sans); cursor: pointer }
+  .ddb .i { color: var(--fg2) }
+  .ddm { position: absolute; right: 0; top: 46px; z-index: 20; min-width: 220px; padding: 5px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); display: none }
+  .ddm.up { top: auto; bottom: 46px; left: 0; right: auto }
+  .dd.open .ddm { display: block }
+  .ddm button { display: flex; width: 100%; gap: 10px; align-items: center; padding: 8px 10px; border: 0; background: none; border-radius: 8px; color: var(--fg); font: 14px var(--sans); cursor: pointer; text-align: left }
+  .ddm button:hover { background: var(--surface2) } .ddm button small { margin-left: auto; color: var(--fg3) }
+  .prod { display: flex; justify-content: space-between; align-items: baseline; gap: 16px }
+  .prod h1 { font-size: 19px; letter-spacing: -0.01em } .prod .amt { font: 700 24px var(--display) }
+  .desc { color: var(--fg2); margin: 14px 0 26px; font-size: 16px }
+  .box { border: 1px solid var(--field-line); border-radius: 14px; background: color-mix(in oklab, var(--right) 40%, transparent); margin-bottom: 18px }
+  .box > button { display: flex; width: 100%; justify-content: space-between; align-items: center; padding: 20px; background: none; border: 0; color: var(--fg); font: 600 15.5px var(--sans); cursor: pointer }
+  .box > button .i { transition: transform .2s; color: var(--fg2) } .box.open > button .i { transform: rotate(180deg) }
+  .box .more { display: none; padding: 0 20px 18px; font-size: 14.5px; color: var(--fg2) } .box.open .more { display: block }
+  .ent { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0 } .ent .i { color: var(--good); margin-top: 3px } .ent b { color: var(--fg); font-weight: 600 }
+  .disc { display: flex; justify-content: space-between; align-items: center; padding: 22px 20px; gap: 12px; font-weight: 600; font-size: 15.5px }
+  .disc .lnk { background: none; border: 0; color: var(--fg); font: 600 15.5px var(--sans); cursor: pointer; padding: 0 }
+  .disc form { display: flex; gap: 8px; flex: 1; justify-content: flex-end } .disc input { max-width: 180px; height: 38px }
+  .disc .ok { color: var(--good); font-weight: 600; display: flex; gap: 8px; align-items: center }
+  .sum { margin-top: 8px; font-size: 16px }
+  .sum div { display: flex; justify-content: space-between; padding: 9px 0; color: var(--fg2) }
+  .sum .tot { border-top: 1px solid var(--field-line); margin-top: 10px; padding-top: 20px; color: var(--fg); font: 700 20px var(--display) }
+  .sum .save { color: var(--good) }
+  .tools { position: absolute; left: 32px; bottom: 28px; display: flex; gap: 10px; align-items: center }
+  .tools .ddb { height: 38px; background: var(--right) }
+  .tools .theme-sw { border-radius: 10px; padding: 3px; background: var(--right); box-shadow: inset 0 0 0 1px var(--field-line) } .tools .theme-sw button { border-radius: 7px; width: 36px; height: 30px }
+  h2.sec { font: 600 20px var(--display); letter-spacing: -0.01em; margin: 0 0 22px }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px } @media (max-width: 520px) { .row2 { grid-template-columns: 1fr } }
+  .f { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px }
+  .f label { font-weight: 600; font-size: 15px } .f label .req { color: var(--bad) }
+  .inp { height: 50px; width: 100%; padding: 0 16px; border-radius: 10px; border: 1px solid var(--field-line); background: var(--field); color: var(--fg); font: 15.5px var(--sans); outline: none; transition: border-color .15s, box-shadow .15s }
+  .inp::placeholder { color: var(--fg3) }
+  .inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent) }
+  .inp.bad { border-color: var(--bad) } .err { color: var(--bad); font-size: 13px; display: none } .f.has-err .err { display: block }
+  .phone { display: flex; border: 1px solid var(--field-line); border-radius: 10px; background: var(--field); overflow: hidden }
+  .phone select { border: 0; background: none; color: var(--fg); padding: 0 8px 0 14px; font: 15px var(--sans); border-right: 1px solid var(--field-line); cursor: pointer }
+  .phone input { border: 0; border-radius: 0; flex: 1; box-shadow: none !important }
+  .phone:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent) }
+  .addr { border: 1px solid var(--field-line); border-radius: 10px; background: var(--field); overflow: hidden }
+  .addr select, .addr input { width: 100%; height: 52px; border: 0; background: none; color: var(--fg); padding: 0 16px; font: 600 15.5px var(--sans); outline: none }
+  .addr input { font-weight: 400; border-top: 1px solid var(--field-line) }
+  .addr input::placeholder { color: var(--fg3) }
+  .addr select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--fg2) 50%), linear-gradient(135deg, var(--fg2) 50%, transparent 50%); background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%; background-size: 6px 6px; background-repeat: no-repeat; cursor: pointer }
+  .addr .grid3 { display: grid; grid-template-columns: 1.2fr 1fr .8fr } .addr .grid3 input + input { border-left: 1px solid var(--field-line) }
+  .manual { display: inline-block; margin: 10px 0 24px 4px; background: none; border: 0; color: var(--fg); font: 500 14.5px var(--sans); text-decoration: underline dotted; text-underline-offset: 4px; cursor: pointer; padding: 0 }
+  .chk { display: flex; gap: 10px; align-items: center; font-size: 16px; cursor: pointer; margin-bottom: 18px }
+  .chk input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0 }
+  .go { width: 100%; height: 54px; border-radius: 12px; border: 0; background: var(--surface2); color: var(--fg); font: 600 16px var(--sans); cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background .15s, filter .15s }
+  .go.ready { background: var(--fg); color: var(--bg) } .go:hover { filter: brightness(1.08) }
+  .go:disabled { opacity: .6; cursor: progress }
+  .spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: sp .7s linear infinite } @keyframes sp { to { transform: rotate(360deg) } }
+  .legal { text-align: center; color: var(--fg2); font-size: 14.5px; margin-top: 34px; line-height: 1.6 }
+  .legal .lnks { display: flex; gap: 16px; justify-content: center; margin-top: 14px; font-weight: 500 } .legal .lnks a { color: var(--fg2) }
+  .who { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--field-line); margin-bottom: 24px; font-size: 14.5px; color: var(--fg2) }
+  .who b { color: var(--fg); display: block; font-size: 15px } .who button { background: none; border: 0; color: var(--accent); font: 600 14px var(--sans); cursor: pointer }
+  .card-box { border: 1px solid var(--field-line); border-radius: 10px; background: var(--field); overflow: hidden }
+  .card-box .cn { position: relative } .card-box .cn input { padding-right: 120px }
+  .card-box .brands { position: absolute; right: 12px; top: 50%; translate: 0 -50%; display: flex; gap: 6px }
+  .card-box .brands i { width: 32px; height: 21px; border-radius: 4px; background: var(--surface2); border: 1px solid var(--line); display: grid; place-items: center; font: 700 8px var(--sans); color: var(--fg2); font-style: normal }
+  .card-box .brands i.on { background: var(--accent); color: #fff; border-color: transparent }
+  .card-box input { width: 100%; height: 52px; border: 0; background: none; color: var(--fg); padding: 0 16px; font: 15.5px var(--sans); outline: none; font-variant-numeric: tabular-nums }
+  .card-box input::placeholder { color: var(--fg3) }
+  .card-box .two { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--field-line) } .card-box .two input + input { border-left: 1px solid var(--field-line) }
+  .testcard { font-size: 13px; color: var(--fg3); margin: 10px 0 20px 2px } .testcard button { background: none; border: 0; color: var(--accent); cursor: pointer; font: 600 13px var(--sans); padding: 0 }
+  .done { text-align: center; padding-top: 30px }
+  .done .tick { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 22px; background: color-mix(in oklab, var(--good) 18%, transparent); color: var(--good); font-size: 30px }
+  .done h2 { font: 700 30px var(--display); letter-spacing: -0.02em }
+  .done p { color: var(--fg2) }
+  .key { margin: 26px auto; max-width: 420px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 12px; background: var(--surface2); font: 600 16px var(--mono); letter-spacing: .04em }
+  .key button { background: none; border: 0; color: var(--accent); font: 600 13px var(--sans); cursor: pointer }
+  .hide { display: none !important }
+</style>
+</head>
+<body data-page="checkout">
+<div class="demo" role="note"><b>Demo checkout.</b> No payment is taken and nothing you type leaves this page. Use the test card <b>4242 4242 4242 4242</b>.</div>
+<div class="co">
+  <div class="co-l"><div class="in">
+    <div class="top">
+      <a class="brand" href="index.html" id="brand"></a>
+      <div class="dd" id="cur"><button class="ddb" type="button" aria-haspopup="true"><span id="curflag"></span>Pay in <span id="curcode">USD</span><span data-icon="down"></span></button><div class="ddm" id="curmenu"></div></div>
+    </div>
+    <div class="prod"><h1>VisorPro</h1><span class="amt" id="p-price"></span></div>
+    <p class="desc">Everything you reach for, folded into the notch. Point at the camera, use it, move away.</p>
+    <div class="box" id="ents"><button type="button" aria-expanded="false"><span>2 entitlements included</span><span data-icon="down"></span></button>
+      <div class="more"><div class="ent"><span data-icon="check"></span><div><b>Licence key</b> for <span id="e-macs"></span> of your Macs, sent by email</div></div><div class="ent"><span data-icon="check"></span><div><b>Free updates</b> for every version 1 release</div></div></div></div>
+    <div class="box"><div class="disc" id="disc"><span>Have a discount code?</span><button class="lnk" type="button" id="disc-open">Apply discount code</button></div></div>
+    <div class="sum">
+      <div><span>Subtotal</span><span id="s-sub"></span></div>
+      <div class="save hide" id="s-disc-row"><span id="s-disc-lab">Discount</span><span id="s-disc"></span></div>
+      <div><span id="s-tax-lab">Sales Tax</span><span id="s-tax"></span></div>
+      <div class="tot"><span>Total</span><span id="s-tot"></span></div>
+    </div>
+  </div>
+  <div class="tools">
+    <div class="dd" id="lang"><button class="ddb" type="button"><span data-icon="globe"></span>EN<span data-icon="down"></span></button><div class="ddm up"><button type="button">English <small>EN</small></button><button type="button" disabled style="opacity:.5">Deutsch <small>soon</small></button><button type="button" disabled style="opacity:.5">Français <small>soon</small></button><button type="button" disabled style="opacity:.5">日本語 <small>soon</small></button></div></div>
+    <span class="theme-sw" role="group" aria-label="Appearance"><button data-t="light" aria-label="Light" type="button"></button><button data-t="system" aria-label="Match the system" type="button"></button><button data-t="dark" aria-label="Dark" type="button"></button></span>
+  </div></div>
+
+  <div class="co-r"><div class="in">
+    <!-- step 1 -->
+    <form id="step1" novalidate>
+      <h2 class="sec">Contact Information</h2>
+      <div class="f" data-f="name"><label for="name">Full Name <span class="req">*</span></label><input class="inp" id="name" placeholder="eg. John Doe" autocomplete="name"><span class="err">Enter your name.</span></div>
+      <div class="row2">
+        <div class="f" data-f="email"><label for="email">Email <span class="req">*</span></label><input class="inp" id="email" type="email" placeholder="eg. john.doe@example.com" autocomplete="email"><span class="err">Enter an email address; the licence key goes there.</span></div>
+        <div class="f"><label for="phone">Phone (optional)</label><div class="phone"><select id="dial" aria-label="Country code"></select><input class="inp" id="phone" type="tel" autocomplete="tel-national" aria-label="Phone number"></div></div>
+      </div>
+      <div class="f" data-f="addr"><label>Billing address <span class="req">*</span></label>
+        <div class="addr"><select id="country" aria-label="Country"></select><input id="line1" placeholder="Address Line" autocomplete="address-line1" aria-label="Address line">
+          <div class="hide" id="manual"><input id="line2" placeholder="Apartment, suite (optional)" autocomplete="address-line2" aria-label="Address line 2"><div class="grid3"><input id="city" placeholder="City" autocomplete="address-level2" aria-label="City"><input id="state" placeholder="State / region" autocomplete="address-level1" aria-label="State"><input id="zip" placeholder="Postcode" autocomplete="postal-code" aria-label="Postcode"></div></div></div>
+        <span class="err">Enter your address.</span></div>
+      <button class="manual" type="button" id="manual-b">Enter address manually</button>
+      <label class="chk"><input type="checkbox" id="biz"> Purchasing as a business</label>
+      <div class="hide" id="bizf"><div class="row2"><div class="f"><label for="company">Company name</label><input class="inp" id="company" autocomplete="organization"></div><div class="f"><label for="taxid">Tax ID (optional)</label><input class="inp" id="taxid" placeholder="eg. DE123456789"></div></div></div>
+      <button class="go" id="go1" type="submit">Continue to Payment</button>
+    </form>
+
+    <!-- step 2 -->
+    <form id="step2" class="hide" novalidate autocomplete="off">
+      <h2 class="sec">Payment</h2>
+      <div class="who"><div><b id="who-n"></b><span id="who-e"></span></div><button type="button" id="edit">Edit</button></div>
+      <div class="f" data-f="card"><label>Card details <span class="req">*</span></label>
+        <div class="card-box"><div class="cn"><input id="cc" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="off" aria-label="Card number"><span class="brands"><i data-b="visa">VISA</i><i data-b="mc">MC</i><i data-b="amex">AMEX</i></span></div>
+          <div class="two"><input id="exp" inputmode="numeric" placeholder="MM / YY" autocomplete="off" aria-label="Expiry"><input id="cvc" inputmode="numeric" placeholder="CVC" autocomplete="off" aria-label="Security code"></div></div>
+        <span class="err" id="card-err">Check the card number, expiry and security code.</span></div>
+      <div class="testcard">Demo: <button type="button" id="fill">fill in the test card</button>. Any future expiry and any three digits work.</div>
+      <div class="f"><label for="ccname">Name on card</label><input class="inp" id="ccname" autocomplete="off"></div>
+      <button class="go ready" id="pay" type="submit"></button>
+    </form>
+
+    <!-- done -->
+    <div class="done hide" id="done">
+      <div class="tick" data-icon="check"></div>
+      <h2>You’re all set.</h2>
+      <p>Thanks, <span id="d-name"></span>. Your receipt and licence key are on their way to <b id="d-email"></b>.</p>
+      <div class="key"><span id="lic"></span><button type="button" id="copykey">Copy</button></div>
+      <p style="font-size:14px">Open VisorPro, then <b>Settings › General › Licence</b> and paste the key.</p>
+      <div class="ctas"><a class="btn p lg" href="docs.html#install">Download VisorPro</a><a class="btn s lg" href="index.html">Back to the site</a></div>
+      <p style="font-size:13px;color:var(--fg3);margin-top:24px">This was a demo: no order was placed and the key above is made up.</p>
+    </div>
+
+    <div class="legal" id="legal">This order process is conducted by our online reseller &amp; Merchant of Record, who also handles order-related inquiries and returns.
+      <div class="lnks"><a href="docs.html#privacy">Privacy</a><a href="index.html#faq">Terms</a><a href="index.html#faq">Refunds</a></div></div>
+  </div></div>
+</div>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  const VP = window.VP, I = VP.icon, $ = s => document.querySelector(s);
+  const P = VP.pricing;
+  $('#brand').innerHTML = VP.wordmark();
+  $('#e-macs').textContent = P.macs;
+  document.querySelectorAll('.tools .theme-sw button').forEach(b => { b.innerHTML = I({ light: 'sun', system: 'display', dark: 'moon' }[b.dataset.t]); b.addEventListener('click', () => VP.theme(b.dataset.t)) });
+  VP.theme(VP.store.get('vp-theme') || 'system');
+
+  /* countries: name, code, dial, tax rate, tax label, currency */
+  const C = [['United States', 'US', '+1', 0, 'Sales Tax', 'USD', '🇺🇸'], ['United Kingdom', 'GB', '+44', .2, 'VAT (20%)', 'GBP', '🇬🇧'], ['Germany', 'DE', '+49', .19, 'VAT (19%)', 'EUR', '🇩🇪'], ['France', 'FR', '+33', .2, 'VAT (20%)', 'EUR', '🇫🇷'], ['Netherlands', 'NL', '+31', .21, 'VAT (21%)', 'EUR', '🇳🇱'], ['Spain', 'ES', '+34', .21, 'VAT (21%)', 'EUR', '🇪🇸'], ['Italy', 'IT', '+39', .22, 'VAT (22%)', 'EUR', '🇮🇹'], ['Canada', 'CA', '+1', .05, 'GST (5%)', 'CAD', '🇨🇦'], ['Australia', 'AU', '+61', .1, 'GST (10%)', 'AUD', '🇦🇺'], ['Japan', 'JP', '+81', .1, 'Consumption Tax (10%)', 'JPY', '🇯🇵'], ['Other', 'XX', '+', 0, 'Tax', 'USD', '🌐']];
+  $('#country').innerHTML = C.map(c => `<option value="${c[1]}">${c[0]}</option>`).join('');
+  $('#dial').innerHTML = C.filter(c => c[1] !== 'XX').map(c => `<option value="${c[1]}">${c[6]} ${c[2]}</option>`).join('');
+  let cur = 'USD', country = C[0], code = null;
+  const CODES = { NOTCH20: .2, EARLYBIRD: .1 };
+
+  $('#curmenu').innerHTML = Object.entries(P.currencies).map(([k, v]) => `<button type="button" data-c="${k}">${v.flag} ${v.name}<small>${k}</small></button>`).join('');
+  $('#curmenu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = b.dataset.c; $('#cur').classList.remove('open'); calc() });
+  document.querySelectorAll('.dd > .ddb').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const d = b.parentElement; const o = d.classList.contains('open'); document.querySelectorAll('.dd').forEach(x => x.classList.remove('open')); if (!o) d.classList.add('open') }));
+  document.addEventListener('click', () => document.querySelectorAll('.dd').forEach(x => x.classList.remove('open')));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.dd').forEach(x => x.classList.remove('open')) });
+  $('#lang .ddm').addEventListener('click', () => $('#lang').classList.remove('open'));
+
+  function totals() { const sub = P.early, d = code ? sub * CODES[code] : 0, tax = (sub - d) * country[3]; return { sub, d, tax, tot: sub - d + tax } }
+  function calc() {
+    const t = totals(), m = v => VP.money(v, cur);
+    $('#curcode').textContent = cur; $('#curflag').textContent = P.currencies[cur].flag;
+    $('#p-price').textContent = m(t.sub); $('#s-sub').textContent = m(t.sub);
+    $('#s-disc-row').classList.toggle('hide', !code); if (code) { $('#s-disc-lab').textContent = `Discount (${code}, ${CODES[code] * 100}%)`; $('#s-disc').textContent = '−' + m(t.d) }
+    $('#s-tax-lab').textContent = country[4]; $('#s-tax').textContent = m(t.tax); $('#s-tot').textContent = m(t.tot);
+    $('#pay').textContent = 'Pay ' + m(t.tot);
+  }
+  $('#country').addEventListener('change', e => { country = C.find(c => c[1] === e.target.value); const dial = $('#dial'); if ([...dial.options].some(o => o.value === country[1])) dial.value = country[1]; if (P.currencies[country[5]]) cur = country[5]; calc() });
+  $('#ents > button').addEventListener('click', e => { const b = $('#ents'); b.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', b.classList.contains('open')) });
+
+  /* discount */
+  const disc = $('#disc');
+  function discOpen() { disc.innerHTML = `<form id="df"><input class="inp" id="dcode" placeholder="Code" aria-label="Discount code" autocomplete="off"><button class="btn s" type="submit">Apply</button></form>`; $('#dcode').focus();
+    $('#df').addEventListener('submit', e => { e.preventDefault(); const v = $('#dcode').value.trim().toUpperCase(); if (CODES[v]) { code = v; disc.innerHTML = `<span class="ok">${I('tag')} ${v} applied</span><button class="lnk" type="button" id="drm">Remove</button>`; $('#drm').addEventListener('click', () => { code = null; disc.innerHTML = '<span>Have a discount code?</span><button class="lnk" type="button" id="disc-open">Apply discount code</button>'; $('#disc-open').addEventListener('click', discOpen); calc() }); calc() } else { $('#dcode').classList.add('bad'); $('#dcode').value = ''; $('#dcode').placeholder = 'Not a valid code (demo: NOTCH20)' } }) }
+  $('#disc-open').addEventListener('click', discOpen);
+
+  $('#manual-b').addEventListener('click', e => { const m = $('#manual'); m.classList.toggle('hide'); e.target.textContent = m.classList.contains('hide') ? 'Enter address manually' : 'Hide address details' });
+  $('#biz').addEventListener('change', e => $('#bizf').classList.toggle('hide', !e.target.checked));
+
+  /* step 1 */
+  const s1 = $('#step1');
+  const valid = { name: () => $('#name').value.trim().length > 1, email: () => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#email').value.trim()), addr: () => $('#line1').value.trim().length > 3 };
+  const ready = () => $('#go1').classList.toggle('ready', Object.values(valid).every(f => f()));
+  s1.addEventListener('input', e => { const f = e.target.closest('.f[data-f]'); if (f && f.classList.contains('has-err') && valid[f.dataset.f]()) { f.classList.remove('has-err'); f.querySelectorAll('.inp').forEach(x => x.classList.remove('bad')) } ready() });
+  s1.addEventListener('submit', e => {
+    e.preventDefault(); let first = null;
+    for (const [k, f] of Object.entries(valid)) { const el = s1.querySelector(`.f[data-f="${k}"]`); const ok = f(); el.classList.toggle('has-err', !ok); el.querySelectorAll('.inp').forEach(x => x.classList.toggle('bad', !ok)); if (!ok && !first) first = el.querySelector('input') }
+    if (first) { first.focus(); return }
+    $('#who-n').textContent = $('#name').value.trim(); $('#who-e').textContent = $('#email').value.trim();
+    $('#ccname').value = $('#name').value.trim();
+    s1.classList.add('hide'); $('#step2').classList.remove('hide'); $('#cc').focus(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  $('#edit').addEventListener('click', () => { $('#step2').classList.add('hide'); s1.classList.remove('hide') });
+
+  /* step 2: card formatting and checks, all local */
+  const cc = $('#cc'), exp = $('#exp'), cvc = $('#cvc');
+  const brand = n => /^4/.test(n) ? 'visa' : /^(5[1-5]|2[2-7])/.test(n) ? 'mc' : /^3[47]/.test(n) ? 'amex' : '';
+  const luhn = n => { let s = 0, alt = false; for (let i = n.length - 1; i >= 0; i--) { let d = +n[i]; if (alt) { d *= 2; if (d > 9) d -= 9 } s += d; alt = !alt } return n.length >= 13 && s % 10 === 0 };
+  cc.addEventListener('input', () => { const n = cc.value.replace(/\D/g, '').slice(0, 16); const b = brand(n); cc.value = b === 'amex' ? n.replace(/^(\d{0,4})(\d{0,6})(\d{0,5}).*/, (m, a, b2, c) => [a, b2, c].filter(Boolean).join(' ')) : n.replace(/(\d{4})(?=\d)/g, '$1 '); document.querySelectorAll('.brands i').forEach(i => i.classList.toggle('on', i.dataset.b === b)) });
+  exp.addEventListener('input', () => { const n = exp.value.replace(/\D/g, '').slice(0, 4); exp.value = n.length > 2 ? n.slice(0, 2) + ' / ' + n.slice(2) : n });
+  cvc.addEventListener('input', () => { cvc.value = cvc.value.replace(/\D/g, '').slice(0, 4) });
+  $('#fill').addEventListener('click', () => { cc.value = '4242424242424242'; cc.dispatchEvent(new Event('input')); const d = new Date(); exp.value = pad(d.getMonth() + 1) + (d.getFullYear() + 3 - 2000); exp.dispatchEvent(new Event('input')); cvc.value = '123' });
+  const pad = n => String(n).padStart(2, '0');
+  $('#step2').addEventListener('submit', e => {
+    e.preventDefault();
+    const n = cc.value.replace(/\D/g, ''), [mm, yy] = exp.value.split('/').map(x => +x.trim());
+    const now = new Date(), expOk = mm >= 1 && mm <= 12 && (2000 + yy > now.getFullYear() || (2000 + yy === now.getFullYear() && mm >= now.getMonth() + 1));
+    const ok = luhn(n) && expOk && /^\d{3,4}$/.test(cvc.value);
+    const f = $('#step2 .f[data-f="card"]'); f.classList.toggle('has-err', !ok);
+    $('#card-err').textContent = !luhn(n) ? 'That card number doesn’t look right.' : !expOk ? 'Check the expiry date.' : 'Enter the three or four digit security code.';
+    if (!ok) return;
+    const pay = $('#pay'); pay.disabled = true; pay.innerHTML = '<span class="spin"></span> Processing…';
+    setTimeout(() => {
+      cc.value = exp.value = cvc.value = ''; // forget the card straight away
+      const seg = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
+      $('#lic').textContent = `VPRO-${seg()}-${seg()}-${seg()}-${seg()}`;
+      $('#d-name').textContent = $('#name').value.trim().split(' ')[0]; $('#d-email').textContent = $('#email').value.trim();
+      $('#step2').classList.add('hide'); $('#legal').classList.add('hide'); $('#done').classList.remove('hide');
+    }, 1400);
+  });
+  $('#copykey').addEventListener('click', e => { try { navigator.clipboard.writeText($('#lic').textContent).then(() => { e.target.textContent = 'Copied' }) } catch (x) { /* */ } });
+  calc();
+})();
+</script>
+</body>
+</html>
