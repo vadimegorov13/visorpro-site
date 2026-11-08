@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 3 · Editorial</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 3 · Editorial: a magazine spread in forest green and cream. Big serif, numbered sections, a mono byline.
+     The panel drops from the notch at the top of the page, as in the app. */
+  :root { --bg: #0f2a1f; --bg2: #13332600; --cream: #f1e8d4; --cream2: rgba(241, 232, 212, .66); --rule: rgba(241, 232, 212, .2); --coral: #ff7a5c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--cream); font: 17px/1.6 "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .07; z-index: 100;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .x-w { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+  .x-mono { font: 500 12px/1.4 "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--cream2); }
+  .x-mast { display: grid; grid-template-columns: 1fr 260px 1fr; align-items: center; height: 46px; border-bottom: 1px solid var(--rule); }
+  .x-mast .r { text-align: right; }
+  .x-mast a { color: var(--cream); text-decoration: none; margin-left: 18px; }
+  .x-mast a:hover { color: var(--coral); }
+
+  .x-cover { padding: calc(var(--panel-h, 330px) + 40px) 0 60px; border-bottom: 1px solid var(--rule); position: relative; }
+  .x-cover h1 { font: 400 clamp(64px, 11vw, 168px)/.88 "Instrument Serif", serif; letter-spacing: -.035em; margin: 0; }
+  .x-cover h1 i { color: var(--coral); }
+  .x-dek { display: grid; grid-template-columns: 1.3fr 1fr; gap: 60px; margin-top: 40px; align-items: end; }
+  .x-dek p { font: 400 26px/1.35 "Instrument Serif", serif; margin: 0; color: var(--cream); }
+  .x-dek p::first-letter { font-size: 3.1em; float: left; line-height: .8; margin: 6px 10px 0 0; color: var(--coral); }
+  .x-buy { display: inline-flex; align-items: center; gap: 12px; padding: 16px 26px; background: var(--cream); color: var(--bg); font-weight: 600; text-decoration: none; border-radius: 2px; }
+  .x-buy:hover { background: var(--coral); color: #fff; }
+  .x-buy s { opacity: .55; font-weight: 400; }
+  .x-cta { display: grid; gap: 14px; justify-items: start; }
+  .x-up { position: absolute; left: 50%; top: calc(var(--panel-h, 330px) - 6px); transform: translateX(-50%); }
+  .x-up::before { content: "↑ "; color: var(--coral); }
+
+  .x-sec { display: grid; grid-template-columns: 220px 1fr; gap: 40px; padding: 60px 0; border-bottom: 1px solid var(--rule); }
+  .x-sec h2 { font: 400 54px/1 "Instrument Serif", serif; margin: 0 0 30px; letter-spacing: -.02em; }
+  .x-sec h2 i { color: var(--coral); }
+  .x-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .x-art { padding: 0 26px 6px; border-left: 1px solid var(--rule); background: none; border-top: 0; border-right: 0; border-bottom: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+  .x-art:first-child { border-left: 0; padding-left: 0; }
+  .x-art .n { font: 400 64px/1 "Instrument Serif", serif; color: var(--coral); }
+  .x-art h3 { font: 400 28px/1.12 "Instrument Serif", serif; margin: 10px 0 10px; }
+  .x-art p { margin: 0; color: var(--cream2); font-size: 15.5px; }
+  .x-art .x-mono { display: block; margin-top: 16px; color: var(--cream); }
+  .x-art:hover h3 { text-decoration: underline; text-decoration-color: var(--coral); text-underline-offset: 5px; }
+
+  .x-quote { font: 400 clamp(34px, 5vw, 64px)/1.08 "Instrument Serif", serif; letter-spacing: -.02em; margin: 0; }
+  .x-quote i { color: var(--coral); }
+  .x-quote + .x-mono { margin-top: 20px; }
+  .x-list { columns: 2; column-gap: 40px; margin: 0; padding: 0; list-style: none; }
+  .x-list li { break-inside: avoid; padding: 12px 0; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; gap: 20px; }
+  .x-list li span { color: var(--cream2); }
+  .x-list button { all: unset; cursor: pointer; font-weight: 600; } .x-list button:hover { color: var(--coral); }
+
+  .x-price { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+  .x-price b { font: 400 140px/.85 "Instrument Serif", serif; letter-spacing: -.04em; }
+  .x-price s { font: 400 40px "Instrument Serif", serif; color: var(--cream2); margin-left: 10px; }
+  .x-faq details { border-top: 1px solid var(--rule); padding: 16px 0; }
+  .x-faq summary { cursor: pointer; font: 400 24px "Instrument Serif", serif; list-style: none; }
+  .x-faq summary::before { content: "+ "; color: var(--coral); font-family: "IBM Plex Mono"; font-size: 18px; }
+  .x-faq details[open] summary::before { content: "– "; }
+  .x-faq p { margin: 8px 0 0 24px; color: var(--cream2); }
+  .x-foot { padding: 30px 0 50px; display: flex; justify-content: space-between; }
+  .x-foot a { color: inherit; }
+  @media (max-width: 860px) {
+    .x-w { padding: 0 18px; }
+    .x-mast { grid-template-columns: 1fr 1fr; } .x-mast .c { display: none; } .x-mast a:not(.x-keep) { display: none; }
+    .x-dek, .x-sec, .x-price { grid-template-columns: 1fr; gap: 20px; }
+    .x-cols { grid-template-columns: 1fr; gap: 26px; } .x-art { border-left: 0; padding: 0; }
+    .x-list { columns: 1; } .x-price b { font-size: 96px; }
+  }
+</style>
+</head>
+<body>
+<div class="x-w">
+  <header class="x-mast x-mono">
+    <span>VisorPro · Issue Nº 1</span><span class="c"></span>
+    <span class="r"><a href="#field">Field notes</a><a href="#price">Price</a><a class="x-keep" href="checkout.html">Buy <span data-price></span></a></span>
+  </header>
+
+  <section class="x-cover">
+    <span class="x-up x-mono">The panel above is live. Point at it.</span>
+    <h1>The <i>notch</i>,<br>put to work.</h1>
+    <div class="x-dek">
+      <p>For years the black cut-out at the top of your MacBook held a camera and nothing else. VisorPro makes it a drawer: your clipboard, calendar, reminders, music and timers, one point of the pointer away, and gone the moment you move on.</p>
+      <div class="x-cta"><a class="x-buy" href="checkout.html">Buy VisorPro · <span data-price></span> <s data-price-was></s></a><span class="x-mono">Pay once · <span data-trial></span>-day free trial · macOS 13+</span></div>
+    </div>
+  </section>
+
+  <section class="x-sec" id="field">
+    <div class="x-mono">§ 1<br>Field notes</div>
+    <div>
+      <h2>Three things you’ll do <i>by Friday.</i></h2>
+      <div class="x-cols">
+        <button class="x-art" data-open-tab="clipboard"><span class="n">i.</span><h3>Paste the thing you copied an hour ago.</h3><p>Every copy, kept on your Mac. Links, text, colours, screenshots, files. Passwords are never recorded.</p><span class="x-mono">Open Clipboard ↗</span></button>
+        <button class="x-art" data-open-tab="calendar"><span class="n">ii.</span><h3>Join the call without hunting for the link.</h3><p>What’s next, with a countdown and a Join button, over any app, even full screen if you like.</p><span class="x-mono">Open Calendar ↗</span></button>
+        <button class="x-art" data-open-tab="menubar"><span class="n">iii.</span><h3>Reach the icons the camera ate.</h3><p>A full menu bar hides icons behind the notch. They’re all here, one click from their own menus.</p><span class="x-mono">Open Menu Bar ↗</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="x-sec">
+    <div class="x-mono">§ 2<br>In brief</div>
+    <div>
+      <p class="x-quote">“It replaced <i>four</i> little apps and I stopped looking for any of them.”</p>
+      <p class="x-mono">What we hope you’ll say after a week</p>
+      <ul class="x-list" style="margin-top:34px">
+        <li><button data-open-tab="tasks">Reminders</button><span>synced with your iPhone</span></li>
+        <li><button data-open-tab="player">Now playing</button><span>any app, any browser</span></li>
+        <li><button data-open-tab="clock">Focus timer</button><span>Pomodoro, timers, alarms</span></li>
+        <li><button data-open-tab="calculator">Calculator</button><span>sums, units, currencies</span></li>
+        <li><button data-open-tab="shelf">Shelf</button><span>park files, drag them out</span></li>
+        <li><button data-open-search>Search · ⌘K</button><span>everything, from the keyboard</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="x-sec" id="price">
+    <div class="x-mono">§ 3<br>The price</div>
+    <div class="x-price">
+      <div><b data-price></b><s data-price-was></s><p class="x-mono" style="margin-top:16px">Once. No subscription. On <span data-macs></span> Macs. Refunds within 14 days.</p></div>
+      <a class="x-buy" href="checkout.html">Buy it →</a>
+    </div>
+  </section>
+
+  <section class="x-sec x-faq">
+    <div class="x-mono">§ 4<br>Letters</div>
+    <div data-faq="6"></div>
+  </section>
+  <footer class="x-foot x-mono"><span>VisorPro · Mac Utilities Suite</span><a href="mailto:hello@visorpro.app">hello@visorpro.app</a></footer>
+</div>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount({ accent: '#ff7a5c' });
+  VP.kit.fill();
+  VP.kit.autoOpen(700);
+</script>
+</body>
+</html>

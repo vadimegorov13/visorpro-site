@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 7 · Replace five apps</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 7 · Replace five apps: the practical pitch. A receipt of the little apps VisorPro stands in for, which you can
+     tick and price yourself, against one price. Each line opens that tab in the real panel. Deep teal and mint. */
+  :root { --bg: #042624; --bg2: #073532; --ink: #e6fff7; --ink2: rgba(230, 255, 247, .62); --mint: #5ff5c4; --line: rgba(95, 245, 196, .16); --paper: #fbfaf5; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Manrope, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(60% 40% at 50% 0%, rgba(95, 245, 196, .14), transparent 70%); }
+  .x-w { max-width: 1160px; margin: 0 auto; padding: 0 26px; }
+  .x-top { display: flex; justify-content: space-between; align-items: center; height: calc(32px * var(--s, 1) + 14px); padding: 0 22px; font-weight: 700; }
+  .x-top > span { display: flex; align-items: center; gap: 9px; }
+  .x-top a { white-space: nowrap; }
+  .x-top a { color: var(--mint); text-decoration: none; }
+  .x-btn { display: inline-flex; gap: 8px; align-items: center; padding: 14px 22px; border-radius: 12px; background: var(--mint); color: #032a22 !important; font-weight: 800; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; font-size: 16px; }
+  .x-btn:hover { filter: brightness(1.08); }
+  .x-btn.g { background: transparent; color: var(--mint) !important; box-shadow: inset 0 0 0 1.5px var(--line); }
+
+  .x-hero { display: grid; grid-template-columns: 1fr 440px; gap: 50px; align-items: center; padding: calc(var(--panel-h, 330px) + 10px) 0 70px; }
+  .x-hero h1 { font: 800 clamp(40px, 5.6vw, 70px)/1 Manrope; letter-spacing: -.045em; margin: 0 0 18px; }
+  .x-hero h1 span { color: var(--mint); }
+  .x-hero p { color: var(--ink2); font-size: 18.5px; margin: 0 0 26px; max-width: 32em; }
+  .x-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* The receipt */
+  .x-rcpt { background: var(--paper); color: #1e2a27; border-radius: 6px 6px 0 0; padding: 26px 26px 34px; font-size: 14.5px; position: relative; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .6); transform: rotate(1.2deg);
+    -webkit-mask: radial-gradient(9px at 50% 100%, transparent 98%, #000) 50% 100% / 18px 100% repeat-x; mask: radial-gradient(9px at 50% 100%, transparent 98%, #000) 50% 100% / 18px 100% repeat-x; }
+  .x-rcpt h3 { margin: 0; text-align: center; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: #5b6a66; }
+  .x-rcpt .sub { text-align: center; font-size: 12.5px; color: #8a9692; margin: 4px 0 14px; }
+  .x-line { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed #d9dcd5; cursor: pointer; }
+  .x-line:hover .nm { color: #0a8a66; }
+  .x-line input[type=checkbox] { width: 17px; height: 17px; accent-color: #0a8a66; margin: 0; }
+  .x-line .nm b { display: block; font-weight: 700; } .x-line .nm small { color: #7a8783; }
+  .x-line .pr { display: flex; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .x-line .pr input { width: 52px; border: 0; border-bottom: 1px solid #c9cec6; background: none; font: inherit; text-align: right; color: inherit; padding: 0; }
+  .x-line.off { opacity: .45; } .x-line.off .pr { text-decoration: line-through; }
+  .x-tot { display: flex; justify-content: space-between; margin-top: 14px; font-weight: 800; font-size: 17px; }
+  .x-vp { display: flex; justify-content: space-between; margin-top: 6px; font-weight: 800; font-size: 17px; color: #0a8a66; }
+  .x-save { margin-top: 14px; text-align: center; padding: 12px; border: 2px solid #0a8a66; border-radius: 6px; color: #0a8a66; font-weight: 800; font-size: 19px; transform: rotate(-2deg); }
+  .x-note { font-size: 11.5px; color: #8a9692; margin-top: 12px; text-align: center; }
+
+  .x-h2 { font: 800 clamp(30px, 3.6vw, 44px)/1.05 Manrope; letter-spacing: -.035em; margin: 0 0 26px; }
+  .x-h2 span { color: var(--mint); }
+  .x-plus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; margin-bottom: 80px; }
+  .x-plus button { background: var(--bg); border: 0; color: var(--ink); text-align: left; padding: 20px; cursor: pointer; font: inherit; display: grid; gap: 6px; }
+  .x-plus button:hover { background: var(--bg2); }
+  .x-plus .i { width: 22px; height: 22px; display: block; color: var(--mint); }
+  .x-plus b { font-size: 16px; } .x-plus span { color: var(--ink2); font-size: 14px; }
+  .x-end { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding-bottom: 70px; }
+  .x-faq details { border-bottom: 1px solid var(--line); padding: 14px 0; }
+  .x-faq summary { cursor: pointer; font-weight: 700; }
+  .x-faq p { color: var(--ink2); margin: 8px 0 0; }
+  .x-buybox { background: var(--bg2); border: 1px solid var(--line); border-radius: 22px; padding: 30px; align-self: start; }
+  .x-buybox b { font-size: 56px; font-weight: 800; letter-spacing: -.04em; } .x-buybox s { color: var(--ink2); margin-left: 8px; }
+  .x-buybox ul { padding: 0; list-style: none; margin: 14px 0 22px; display: grid; gap: 6px; color: var(--ink2); }
+  .x-buybox li::before { content: "✓ "; color: var(--mint); }
+  .x-foot { border-top: 1px solid var(--line); padding: 24px 0 40px; color: var(--ink2); font-size: 14px; } .x-foot a { color: inherit; }
+  @media (max-width: 960px) { .x-hero, .x-end { grid-template-columns: 1fr; } .x-plus { grid-template-columns: 1fr 1fr; } .x-rcpt { transform: none; } }
+</style>
+</head>
+<body>
+<header class="x-top"><span><span data-mark="22"></span>VisorPro</span><a href="checkout.html">Buy · <span data-price></span> →</a></header>
+<div class="x-w">
+  <section class="x-hero">
+    <div>
+      <h1>Five little apps.<br><span>One notch.</span></h1>
+      <p>Clipboard manager, menu bar tidier, focus timer, now-playing widget, quick calculator: VisorPro is all of them, in the notch, for one price. Click any line on the receipt and that part opens in the real panel above.</p>
+      <div class="x-ctas"><a class="x-btn" href="checkout.html">Buy VisorPro · <span data-price></span></a><a class="x-btn g" href="#">Free <span data-trial></span>-day trial</a></div>
+    </div>
+    <div class="x-rcpt" data-vp-keep>
+      <h3>What you’d buy instead</h3>
+      <div class="sub">Tick what you’d use. The prices are rough guesses; type your own.</div>
+      <div id="lines"></div>
+      <div class="x-tot"><span>Separately</span><span id="sum"></span></div>
+      <div class="x-vp"><span>VisorPro, once</span><span data-price></span></div>
+      <div class="x-save" id="save"></div>
+      <div class="x-note">Plus 8 more tabs you get anyway: Shelf, Notes, Translate, Captures, Shortcuts, Widgets…</div>
+    </div>
+  </section>
+
+  <h2 class="x-h2">And the rest is <span>included.</span></h2>
+  <section class="x-plus">
+    <button data-open-tab="calendar"><span data-i="calendar"></span><b>Calendar</b><span>Next meeting, countdown, Join.</span></button>
+    <button data-open-tab="tasks"><span data-i="checklist"></span><b>Reminders</b><span>Synced with your iPhone.</span></button>
+    <button data-open-tab="shelf"><span data-i="tray"></span><b>Shelf</b><span>Park files, drag them out.</span></button>
+    <button data-open-tab="notes"><span data-i="notes"></span><b>Notes</b><span>Quick notes and voice notes.</span></button>
+    <button data-open-tab="translate"><span data-i="translate"></span><b>Translate</b><span>On-device, as you type.</span></button>
+    <button data-open-tab="captures"><span data-i="captures"></span><b>Captures</b><span>Fresh screenshots to drag out.</span></button>
+    <button data-open-tab="shortcuts"><span data-i="shortcuts"></span><b>Shortcuts</b><span>Apps, keys, scripts, layouts.</span></button>
+    <button data-open-search><span data-i="search"></span><b>⌘K Search</b><span>All of it from the keyboard.</span></button>
+  </section>
+
+  <section class="x-end" id="price">
+    <div class="x-buybox"><b data-price></b><s data-price-was></s><ul><li>Pay once, keep it</li><li>Every version 1 update</li><li>On <span data-macs></span> Macs</li><li>Nothing leaves your Mac</li><li>Refunds within 14 days</li></ul><a class="x-btn" href="checkout.html">Buy VisorPro</a></div>
+    <div class="x-faq" data-faq="6"></div>
+  </section>
+  <footer class="x-foot">VisorPro · Mac Utilities Suite · <a href="mailto:hello@visorpro.app">hello@visorpro.app</a></footer>
+</div>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount({ accent: '#5ff5c4', look: 'tinted' });
+  VP.kit.fill();
+  const LINES = [
+    ['clipboard', 'Clipboard manager', 'history, saved snippets', 15],
+    ['menubar', 'Menu bar organiser', 'the icons behind the notch', 16],
+    ['clock', 'Focus timer', 'Pomodoro, timers, alarms', 9],
+    ['player', 'Now-playing widget', 'any app, any browser', 5],
+    ['calculator', 'Quick calculator', 'sums, units, currencies', 7],
+  ];
+  const el = document.getElementById('lines');
+  el.innerHTML = LINES.map(([tab, n, d, p], i) => `<div class="x-line" data-tab="${tab}"><input type="checkbox" checked aria-label="Count ${n}"><span class="nm"><b>${n}</b><small>${d}</small></span><span class="pr">$<input inputmode="decimal" value="${p}" data-p="${i}" aria-label="${n} price"></span></div>`).join('');
+  function total() {
+    let s = 0;
+    el.querySelectorAll('.x-line').forEach((l) => { const on = l.querySelector('[type=checkbox]').checked; l.classList.toggle('off', !on); if (on) s += parseFloat(l.querySelector('[data-p]').value) || 0; });
+    document.getElementById('sum').textContent = '$' + s.toFixed(2);
+    const d = s - VP.pricing.early;
+    document.getElementById('save').textContent = d > 0 ? `You keep $${d.toFixed(2)}` : 'Still one app instead of five';
+  }
+  el.addEventListener('input', total);
+  el.addEventListener('click', (e) => { const l = e.target.closest('.x-line'); if (l && !e.target.matches('input')) VP.demo.setTab(l.dataset.tab); });
+  total();
+  VP.kit.autoOpen(700, 'clipboard');
+</script>
+</body>
+</html>

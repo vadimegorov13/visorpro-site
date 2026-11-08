@@ -23,8 +23,6 @@
 
 /* the camera housing */
 .notch { position: absolute; top: 0; left: 663.5px; width: 185px; height: 32px; background: #000; border-radius: 0 0 11px 11px; z-index: 30 }
-.notch::before, .notch::after { content: ""; position: absolute; top: 0; width: 8px; height: 8px; background: radial-gradient(circle at 0 100%, transparent 7.5px, #000 8px) }
-.notch::before { left: -8px; transform: scaleX(-1) } .notch::after { right: -8px }
 .notch .cam { position: absolute; left: 50%; top: 11px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #20304d, #05070b 70%) }
 .notch .ring { position: absolute; inset: -6px -10px; border-radius: 0 0 18px 18px; border: 1.5px dashed transparent; transition: border-color .3s }
 .hot { position: absolute; top: 0; left: 638px; width: 236px; height: 36px; z-index: 31 }
@@ -33,16 +31,15 @@
 
 /* ---------------- panel ---------------- */
 .pn { --acc: #ff5ca8; --tile: #151517; --tile-line: rgba(255,255,255,.055); --rail: #0c0c0d; --rail-line: rgba(255,255,255,.1); --ear: #000;
-  position: absolute; z-index: 20; left: 446px; top: 0; width: 620px; height: 254px; border-radius: 0 0 26px 26px; transform-origin: 50% 0;
+  position: absolute; z-index: 20; left: 446px; top: 0; width: 620px; height: var(--ph, 254px); border-radius: 0 0 26px 26px; transform-origin: 50% 0;
   transform: scale(var(--sx, .298), var(--sy, .126)); opacity: var(--po, 0); pointer-events: none; color: #f5f5f7; font-size: 12px; line-height: 1.25 }
 .pn.open { --sx: 1; --sy: 1; --po: 1; pointer-events: auto }
-.pn.anim { transition: transform .5s cubic-bezier(.2,.95,.28,1.03), opacity .22s ease }
+.pn.anim { transition: transform .5s cubic-bezier(.2,.95,.28,1.03), opacity .22s ease, height .45s cubic-bezier(.2,.9,.25,1) }
+.pn.morph, .pn.morph .rail, .pn.morph .main { transition: height .45s cubic-bezier(.2,.9,.25,1), width .45s cubic-bezier(.2,.9,.25,1), left .45s cubic-bezier(.2,.9,.25,1) }
 .pn.anim:not(.open) { transition: transform .3s cubic-bezier(.4,0,.6,1), opacity .25s ease .05s }
 .pn .bg, .pn .glow, .pn .edge { position: absolute; inset: 0; border-radius: inherit; pointer-events: none }
 .pn .bg { background: #000; box-shadow: 0 24px 50px -20px rgba(0,0,0,.55) }
 .pn .glow, .pn .edge { display: none }
-.pn::before, .pn::after { content: ""; position: absolute; top: 0; width: 10px; height: 10px; background: radial-gradient(circle at 0 100%, transparent 9.5px, var(--ear) 10px); z-index: 1 }
-.pn::before { left: -10px; transform: scaleX(-1) } .pn::after { right: -10px }
 .pn .in { position: absolute; inset: 0; opacity: var(--ci, 1); transition: opacity .2s }
 .pn:not(.open) .in { --ci: 0 }
 .pn.open .in { transition: opacity .25s ease .16s }
@@ -70,21 +67,44 @@
 .msg.on { opacity: 1; transform: none }
 
 /* tab bar */
-.rail { position: absolute; left: 8px; top: 32px; bottom: 8.5px; width: 44px; border-radius: 14px; background: var(--rail); box-shadow: inset 0 0 0 1px var(--rail-line); display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 6px }
-.rail button { position: relative; width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; color: #d8d8dc; font-size: 13px; transition: transform .2s cubic-bezier(.3,.9,.3,1.3), background .15s }
+.rail { position: absolute; left: 8px; top: 32px; bottom: 8.5px; width: var(--rail-w, 44px); border-radius: 14px; background: var(--rail); box-shadow: inset 0 0 0 1px var(--rail-line); display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: var(--tg, 5px); overflow: hidden }
+.rail button { position: relative; width: var(--ti, 28px); height: var(--ti, 28px); flex: none; border-radius: 7px; display: flex; align-items: center; justify-content: center; gap: 7px; color: #d8d8dc; font-size: var(--tis, 13px); transition: transform .2s cubic-bezier(.3,.9,.3,1.3), background .15s }
 .rail button:hover { color: #fff }
 .rail button.on { background: color-mix(in srgb, var(--acc) 26%, #111); color: var(--acc) }
 .rail .pv-day { width: 15px; height: 15px; border-radius: 3.5px; background: #f5f5f7; color: #111; font-size: 8.5px; font-weight: 700; display: flex; flex-direction: column; overflow: hidden; line-height: 1 }
 .rail .pv-day::before { content: ""; height: 4px; background: #ff3b30; flex: none } .rail .pv-day span { flex: 1; display: grid; place-items: center }
 .rail .pv-art { width: 16px; height: 16px; border-radius: 4px; background: var(--art) }
-.rail .bdg { position: absolute; top: -1px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 1.5px #000; display: grid; place-items: center }
-.rail .bdg::after { content: ""; width: 3px; height: 3px; border-radius: 50%; background: #fff }
+.rail .pbdg { position: absolute; top: -1px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 1.5px #000; display: grid; place-items: center }
+.rail .pbdg::after { content: ""; width: 3px; height: 3px; border-radius: 50%; background: #fff }
 .rail .bars { position: absolute; top: 2px; right: -2px; display: flex; gap: 1px; align-items: flex-end; height: 7px }
 .rail .bars i { width: 1.5px; background: var(--acc); border-radius: 1px; animation: eq .9s ease-in-out infinite } .rail .bars i:nth-child(2) { animation-delay: -.3s } .rail .bars i:nth-child(3) { animation-delay: -.6s }
 @keyframes eq { 0%, 100% { height: 2px } 50% { height: 7px } }
 
 /* content */
-.main { position: absolute; left: 67px; right: 16px; top: 32px; bottom: 8.5px }
+.main { position: absolute; left: calc(var(--rail-w, 44px) + 23px); right: 16px; top: 32px; bottom: 8.5px }
+.rail .ti { position: relative; display: grid; place-items: center; flex: none }
+.rail .tnm { display: none; font-size: 11px; font-weight: 600; white-space: nowrap; color: #f2f2f7 }
+.pn.names .rail { align-items: stretch; padding: 8px 6px }
+.pn.names .rail button { width: auto; justify-content: flex-start; padding: 0 8px; border-radius: 6px }
+.pn.names .rail .tnm { display: block }
+.pn.each .rail .ti { color: var(--tc) }
+.pn.each .rail button.on .ti { color: var(--tc) }
+.pn.each .rail button.on { background: color-mix(in srgb, var(--tc) 24%, #111) }
+/* the shared top row: shortcuts with names, then apps */
+.rsc { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: 7px; background: #1c1c1e; font-size: 10.5px; font-weight: 600; color: #f2f2f7; white-space: nowrap; flex: none }
+.rsc .i { font-size: 12px; color: var(--acc) }
+.pn[data-look="liquid"] .rsc, .pn[data-look="fade"] .rsc { background: rgba(255,255,255,.08) }
+.approw { overflow: hidden }
+/* Shortcuts tab */
+.scg { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px }
+.sct { height: 48px; border-radius: 10px; background: var(--tile); box-shadow: inset 0 0 0 1px var(--tile-line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 9.5px; font-weight: 600; color: #e5e5ea; white-space: nowrap; overflow: hidden; padding: 0 4px }
+.sct .i { font-size: 16px } .sct .acc { color: var(--acc) }
+.sct:hover { filter: brightness(1.25) }
+.pn.tall .sct { height: 58px }
+.pn.tall .wg { height: 231px; grid-template-rows: repeat(2, 111px) }
+/* a tab the site doesn't draw */
+.empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #8e8e93; text-align: center }
+.empty span { font-size: 22px; color: #c7c7cc } .empty b { color: #f2f2f7; font-size: 13px } .empty small { font-size: 11px }
 .view { position: absolute; left: 0; right: 0; top: 0; bottom: 46px; overflow: hidden }
 .main.row-top .view { top: 48.5px; bottom: 0 }
 .view > .tab { position: absolute; inset: 0 }
@@ -146,11 +166,11 @@
 .today h3 { margin: 4px 0 2px; font-size: 16.5px; font-weight: 700; letter-spacing: -0.01em }
 .today .when { font-size: 11px; color: #8e8e93; margin-bottom: 10px }
 .today .due { position: absolute; left: 276px; top: 4px; right: 0 }
-.due .it { display: flex; align-items: center; gap: 9px; height: 22px; font-size: 12px; cursor: pointer }
+.due .dit { display: flex; align-items: center; gap: 9px; height: 22px; font-size: 12px; cursor: pointer }
 .due .ck { width: 12px; height: 12px; border-radius: 50%; border: 1.4px solid #ff9f0a; flex: none; display: grid; place-items: center; transition: background .15s }
 .due .ck .i { font-size: 8px; color: #000; opacity: 0 }
-.due .it.done .ck { background: #ff9f0a } .due .it.done .ck .i { opacity: 1 } .due .it.done span { color: #636366; text-decoration: line-through }
-.due .it.od span { color: #ff453a }
+.due .dit.done .ck { background: #ff9f0a } .due .dit.done .ck .i { opacity: 1 } .due .dit.done span { color: #636366; text-decoration: line-through }
+.due .dit.od span { color: #ff453a }
 
 /* Search */
 .srch { position: absolute; inset: 0 0 46px; z-index: 5; display: none; flex-direction: column; background: var(--srch, #000) }
@@ -238,3 +258,32 @@
 .notch.peek .pk { opacity: 1; transition-delay: .2s }
 .notch .pk .a { width: 22px; height: 22px; border-radius: 5px; background: var(--art) }
 .notch .pk span { display: flex; align-items: center; gap: 8px } .notch .pk span:last-child { color: #8e8e93; font-weight: 500 }
+
+/* the page's own styles must never reach inside the screen */
+.scr em, .scr i, .scr b, .scr s { font-family: inherit; letter-spacing: inherit }
+.scr em { font-style: normal }
+/* cropped screens: no menu bar text cut in half, no corner ears */
+.mac.flat .mb .l, .mac.flat .mb .r, .mac.bare .mb { display: none }
+/* the panel on its own, floating on a card */
+.mac.bare .notch, .mac.bare .hot { display: none }
+.mac.bare .pn { border-radius: 14px 14px 26px 26px }
+.mac.bare .pn .bg { box-shadow: none }
+/* rows never squash icons; long names shorten the way the app shortens them */
+.approw .app, .approw .sep, .approw .cust { flex: none }
+.approw:has(.rsc) { gap: 8px }
+.approw:has(.rsc) .sep { margin: 0 2px }
+.rsc { padding: 0 7px 0 6px; gap: 5px; font-size: 10px }
+.nx .t, .nx .s, .wt.awake b, .wt.sc, .np .t, .np .a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100% }
+.nx .row > div { min-width: 0; padding-right: 40px }
+.wt.awake > span:last-child { min-width: 0; display: block }
+.sct .i { font-size: 18px }
+.sct .nm { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+/* picture mode: the panel is the app's own picture */
+.pn.shot { width: var(--iw, 680px); height: auto; border-radius: 0; left: 416px; filter: none }
+.pn.shot .pimg { position: absolute; left: 0; top: 0; width: var(--iw, 680px); height: auto; display: block; -webkit-user-drag: none; user-select: none }
+.pn.shot .pimg:first-child { position: relative }
+.pn.shot .pimg.in-b { animation: shot-b .28s cubic-bezier(.2,.9,.25,1) both } .pn.shot .pimg.in-t { animation: shot-t .28s cubic-bezier(.2,.9,.25,1) both } .pn.shot .pimg.in-f { animation: fadein .22s ease both }
+@keyframes shot-b { from { clip-path: inset(0 0 0 0); opacity: 0; transform: translateY(10px) } } @keyframes shot-t { from { opacity: 0; transform: translateY(-10px) } }
+@media (prefers-reduced-motion: reduce) { .pn.shot .pimg.in-b, .pn.shot .pimg.in-t { animation: fadein .2s both } }
+.peekimg { position: absolute; z-index: 32; top: 0; left: 596px; width: 320px; opacity: 0; transform: scale(.6, .4); transform-origin: 50% 0; transition: opacity .25s, transform .4s cubic-bezier(.2,.9,.3,1.1) }
+.peekimg.on { opacity: 1; transform: none }

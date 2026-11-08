@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VisorPro — site variants</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<style>
+  /* Not part of the site: a page to compare the ten landing-page variants side by side. */
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #16161a; color: #eee; font: 15px/1.5 -apple-system, BlinkMacSystemFont, Inter, sans-serif; padding: 36px 28px 60px; }
+  h1 { font-size: 26px; margin: 0 0 4px; } p.sub { color: #999; margin: 0 0 26px; }
+  .g { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 20px; }
+  a.v { display: block; text-decoration: none; color: inherit; background: #222228; border-radius: 14px; overflow: hidden; transition: transform .15s; }
+  a.v:hover { transform: translateY(-3px); }
+  .f { position: relative; height: 210px; overflow: hidden; background: #000; }
+  .f iframe { width: 1440px; height: 900px; border: 0; transform: scale(.25); transform-origin: 0 0; pointer-events: none; }
+  .t { padding: 12px 16px 16px; } .t b { font-size: 16px; } .t span { display: block; color: #aaa; font-size: 13.5px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<h1>Ten directions for visorpro.app</h1>
+<p class="sub">Each one has the working panel in it. Open one, point at the notch, click around. Then pick one (or mix parts) and I’ll make it the real index.html.</p>
+<div class="g" id="g"></div>
+<script>
+  const V = [
+    ['Desk', 'Warm cream and terracotta, serif. A MacBook sits on the page and the panel works inside its screen.'],
+    ['Desktop', 'The page is a Mac desktop: drag windows, open them from desktop icons or the Dock. No scrolling.'],
+    ['Editorial', 'A magazine spread in forest green and cream. Huge serif, numbered sections, mono bylines.'],
+    ['Loud', 'Electric yellow, heavy black type, hard shadows, stickers and a ticker. Short and shouty.'],
+    ['Terminal', 'For keyboard people: type commands (open clipboard, calc, look liquid, buy) that drive the panel.'],
+    ['60-second tour', 'A little game: five tasks in the real panel tick themselves off, then the page says “you know it”.'],
+    ['Replace five apps', 'The practical pitch: a receipt of the apps it replaces, with your own prices, against one price.'],
+    ['A day with it', 'A workday timeline. Pick a moment, the sky changes to that hour and the panel opens on it.'],
+    ['One screen', 'The shortest: a moving aurora, the panel in Liquid Glass, one line, one price, one button.'],
+    ['Blueprint', 'A technical drawing: grid paper, handwritten notes with arrows to each part of the pinned panel.'],
+    ['Product page (5 + 7)', 'Mac product-page style: black, big tight headlines, tiles, blue pills. Type-anything field and the five-apps comparison.'],
+    ['Scroll story (Apple display page)', 'Dark. The screen zooms in as you scroll and the panel goes through what it does; words light up, numbers count, the panel follows you between screens.'],
+  ];
+  document.getElementById('g').innerHTML = V.map(([n, d], i) => `<a class="v" href="v${i + 1}.html" target="_blank"><div class="f"><iframe src="v${i + 1}.html" loading="lazy" tabindex="-1" title="${n}"></iframe></div><div class="t"><b>${i + 1} · ${n}</b><span>${d}</span></div></a>`).join('');
+</script>
+</body>
+</html>

@@ -15,17 +15,25 @@
     { t: 'Greenhouse', a: 'The Quiet Fields', d: 301, art: 'radial-gradient(70% 60% at 40% 70%, #c6f36b, transparent 60%), radial-gradient(70% 70% at 80% 20%, #0f9b6b, transparent 65%), #10261c' },
   ];
   const STATUS = ['wifi', 'battery', 'search', 'speaker', 'bluetooth', 'cloud', 'shield', 'gauge', 'keyboard', 'brush', 'drive', 'timer', 'mic', 'globe', 'cup', 'eye', 'bolt', 'chip', 'leaf', 'heart', 'tag', 'layers'];
-  const TABS = [['widgets', 'Widgets', 'grid2'], ['today', 'Today', 'today'], ['clipboard', 'Clipboard', 'clipboard'], ['calendar', 'Calendar', 'calendar'], ['player', 'Player', 'player']];
+  /* the app's tabs, in its default order, with the colour each tool uses (VisorSettings.swift) */
+  const ALL = [['widgets', 'Widgets', 'grid2', '#0a84ff'], ['clipboard', 'Clipboard', 'clipboard', '#ff9f0a'], ['captures', 'Captures', 'captures', '#ff375f'], ['shelf', 'Shelf', 'tray', '#40c8e0'],
+    ['shortcuts', 'Shortcuts', 'shortcuts', '#ffd60a'], ['calendar', 'Calendar', 'calendar', '#ff453a'], ['tasks', 'Reminders', 'checklist', '#64d2ff'], ['notes', 'Notes', 'notelines', '#ac8e68'],
+    ['player', 'Player', 'player', '#63e6e2'], ['translate', 'Translate', 'charbubble', '#0a84ff'], ['calculator', 'Calculator', 'fx', '#bf5af2'], ['pomodoro', 'Clock', 'clock', '#30d158'], ['menuBar', 'Menu Bar', 'menubar', '#5e5ce6']];
+  const DEMO = ['widgets', 'clipboard', 'shortcuts', 'calendar', 'player'];
+  const SHORTS = [['termTile', 'Terminal', 0], ['doc', 'Downloads', 0], ['dashedRect', 'Screenshot', 1], ['copy', 'Copy', 1], ['clipboard', 'Paste', 1], ['arrowUpRight', 'Previous App', 1], ['grid4', 'Mission Control', 1],
+    ['play', 'Play/Pause', 1], ['speaker', 'Mute', 1], ['calendar', 'Today’s Date', 1], ['lock', 'Lock Screen', 1]];
   const ROW = [['safari', 1], ['messages', 1], ['mail', 1], ['music', 1], ['notes', 0], ['calendar', 0], ['terminal', 1]];
 
   class Mac {
     constructor(root, o = {}) {
       this.root = root; this.o = o;
+      /* c: how this panel is set up (any of it can change later with configure) */
+      this.c = Object.assign({ tabs: DEMO, names: false, tall: false, rowTop: false, each: false, rowShortcuts: null, apps: ROW }, o.config || {});
       this.s = { tab: o.tab || 'widgets', look: o.look || 'studio', accent: o.accent || '#ff5ca8', open: false, pinned: false, playing: true, ti: 0, pos: 71, timer: 1500, timerOn: false,
         awake: false, done: {}, clipSeg: 'History', poc: false, sel: -1, from: null };
       const now = new Date(); const meet = new Date(Math.ceil((now.getTime() + 12 * 60e3) / 6e4) * 6e4);
       this.meet = meet; this.meetEnd = new Date(meet.getTime() + 45 * 60e3);
-      this.build(); this.setIcons(o.icons || 9); this.render();
+      this.build(); this.setIcons(o.icons || 9); this.configure({});
       if (o.interactive) this.wire();
       setInterval(() => this.tick(), 1000);
       new ResizeObserver(() => this.fit()).observe(root);
@@ -47,6 +55,11 @@
       const q = s => this.root.querySelector(s);
       this.el = { scr: q('.scr'), pn: q('.pn'), rail: q('.rail'), view: q('.view'), row: q('.approw'), main: q('.main'), tn: q('.tn'), back: q('.back'), msg: q('.msg'), srch: q('.srch'), sin: q('.srch input'), sres: q('.sres'), notch: q('.notch'), hot: q('.hot'), cursor: q('.cursor'), r: q('.mb .r'), pk: q('.pk') };
       this.el.pn.style.setProperty('--acc', this.s.accent);
+      if (this.o.shot) {
+        /* the app's own picture of the panel, not a drawing of it */
+        this.el.pn.className = 'pn shot'; this.el.pn.innerHTML = '';
+        this.shotImg(this.o.shot);
+      }
       this.el.r.innerHTML = `${STATUS.map((k, i) => `<span class="st" data-i="${i}">${I(k)}</span>`).join('')}<span class="clock"></span>`;
       this.clock();
     }
@@ -76,8 +89,8 @@
     cursor(x, y, show = true) { const c = this.el.cursor; c.style.setProperty('--cx', x + 'px'); c.style.setProperty('--cy', y + 'px'); c.style.opacity = show ? 1 : 0 }
 
     /* opening: either animated, or set by hand (0…1) for scroll-driven scenes */
-    open(tab) { if (this.s.open && (!tab || tab === this.s.tab)) return; if (tab) this.s.tab = tab; this.el.notch.classList.remove('peek'); this.el.pn.classList.add('anim', 'open'); this.el.pn.style.removeProperty('--sx'); this.el.pn.style.removeProperty('--sy'); this.el.pn.style.removeProperty('--po'); this.s.open = true; this.render() }
-    close() { this.el.pn.classList.add('anim'); this.el.pn.classList.remove('open'); this.s.open = false; this.closeSearch(); this.s.from = null }
+    open(tab) { if (this.o.shot && tab) this.setShot('tab-' + tab, 'f'); if (this.s.open && (!tab || tab === this.s.tab)) return; if (tab) this.s.tab = tab; this.el.notch.classList.remove('peek'); this.el.pn.classList.add('anim', 'open'); this.el.pn.style.removeProperty('--sx'); this.el.pn.style.removeProperty('--sy'); this.el.pn.style.removeProperty('--po'); this.s.open = true; this.render() }
+    close() { this.el.pn.classList.add('anim'); this.el.pn.classList.remove('open'); this.s.open = false; if (!this.o.shot) this.closeSearch(); this.s.from = null }
     drop(t) {
       const P = this.el.pn; P.classList.remove('anim');
       const e = t <= 0 ? 0 : t >= 1 ? 1 : 1 - Math.pow(1 - t, 3) * Math.cos(t * 2.2); // a spring that settles once
@@ -85,12 +98,41 @@
       P.style.setProperty('--sy', (0.126 + (1 - 0.126) * e).toFixed(4));
       P.style.setProperty('--po', clamp(t * 6, 0, 1).toFixed(3));
       P.classList.toggle('open', t > .98); P.style.setProperty('--ci', clamp((t - .55) / .4, 0, 1).toFixed(3));
-      P.querySelector('.in').style.opacity = clamp((t - .55) / .4, 0, 1);
+      const inner = P.querySelector('.in'); if (inner) inner.style.opacity = clamp((t - .55) / .4, 0, 1);
+    }
+    tabs() { return this.c.tabs.map(id => ALL.find(t => t[0] === id)).filter(Boolean) }
+    /* ---------- picture mode ---------- */
+    shotImg(name, dir) {
+      const img = new Image(); img.className = 'pimg' + (dir ? ' in-' + dir : ''); img.alt = 'VisorPro'; img.decoding = 'async';
+      img.src = `assets/shots/${name}.webp`; this.shot = name;
+      const place = () => { const w = (img.naturalWidth || 1360) / 2; this.el.pn.style.setProperty('--iw', w + 'px'); this.el.pn.style.left = (756 - w / 2) + 'px' };
+      img.complete ? place() : img.addEventListener('load', place, { once: true });
+      const old = [...this.el.pn.querySelectorAll('.pimg')];
+      this.el.pn.appendChild(img);
+      if (old.length) setTimeout(() => old.forEach(o => o.remove()), dir ? 320 : 0);
+    }
+    setShot(name, dir) { if (name !== this.shot) this.shotImg(name, dir) }
+    configure(part) {
+      if (this.o.shot) return;
+      for (const [k, v] of Object.entries(part)) if (v !== undefined) this.c[k] = v;
+      const c = this.c, P = this.el.pn;
+      if (!this.tabs().some(t => t[0] === this.s.tab)) this.s.tab = this.tabs()[0][0];
+      const ph = c.tall ? 326 : 254, n = this.tabs().length, railH = ph - 32 - 8.5 - 16, gap = n > 8 ? 1 : 5;
+      const item = clamp(Math.floor((railH - (n - 1) * gap) / n), 14, 28);
+      P.style.setProperty('--ph', ph + 'px'); P.style.setProperty('--rail-w', (c.names ? 135 : 44) + 'px');
+      P.style.setProperty('--ti', item + 'px'); P.style.setProperty('--tg', gap + 'px'); P.style.setProperty('--tis', Math.min(13, Math.round(item * .55)) + 'px');
+      P.classList.toggle('names', c.names); P.classList.toggle('each', c.each); P.classList.toggle('tall', c.tall);
+      this.render();
     }
     setLook(look, accent) { if (look) this.s.look = look; if (accent) this.s.accent = accent; this.el.pn.dataset.look = this.s.look; this.el.pn.style.setProperty('--acc', this.s.accent); this.render() }
     say(text, icon = 'check') { const m = this.el.msg; m.innerHTML = I(icon) + esc(text); m.classList.add('on'); clearTimeout(this.mt); this.mt = setTimeout(() => m.classList.remove('on'), 1800) }
     peek(kind) {
-      if (this.s.open) return; const n = this.el.notch, tr = TRACKS[this.s.ti];
+      if (this.s.open) return;
+      if (this.o.shot) {
+        let pk = this.el.scr.querySelector('.peekimg');
+        if (!pk) { pk = new Image(); pk.className = 'peekimg'; pk.alt = 'A peek'; pk.src = 'assets/shots/peek.webp'; this.el.scr.appendChild(pk) }
+        pk.classList.add('on'); clearTimeout(this.pt); this.pt = setTimeout(() => pk.classList.remove('on'), 3200); return;
+      } const n = this.el.notch, tr = TRACKS[this.s.ti];
       const K = { track: [`<span><span class="a" style="--art:${tr.art}"></span>${esc(tr.t)}</span><span>${esc(tr.a)}</span>`],
         meet: [`<span>${I('calendar')}Design review</span><span>in 5 min</span>`] }[kind];
       this.el.pk.innerHTML = K[0]; n.classList.add('peek'); clearTimeout(this.pt); this.pt = setTimeout(() => n.classList.remove('peek'), 3200);
@@ -98,22 +140,25 @@
 
     /* ---------- drawing ---------- */
     render(dir, keepRail) {
+      if (this.o.shot) return;
       const s = this.s;
+      const TABS = this.tabs();
       this.el.tn.textContent = TABS.find(t => t[0] === s.tab)[1];
       this.el.back.classList.toggle('on', !!s.from);
       const tr = TRACKS[s.ti];
       if (keepRail) this.el.rail.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === s.tab));
-      else this.el.rail.innerHTML = TABS.map(([id, n, ic]) => {
+      else this.el.rail.innerHTML = TABS.map(([id, n, ic, tint]) => {
         let inner = I(ic), extra = '';
-        if (id === 'calendar') { inner = `<span class="pv-day"><span>${new Date().getDate()}</span></span>`; extra = '<span class="bdg"></span>' }
+        if (id === 'calendar') { inner = `<span class="pv-day"><span>${new Date().getDate()}</span></span>`; extra = '<span class="pbdg"></span>' }
         if (id === 'player' && s.playing) { inner = `<span class="pv-art" style="--art:${tr.art}"></span>`; extra = '<span class="bars"><i></i><i></i><i></i></span>' }
-        return `<button class="${id === s.tab ? 'on' : ''}" data-tab="${id}" aria-label="${n}" title="${n}">${inner}${extra}</button>`;
+        return `<button class="${id === s.tab ? 'on' : ''}" data-tab="${id}" aria-label="${n}" title="${n}" style="--tc:${tint}"><span class="ti">${inner}${extra}</span><span class="tnm">${n}</span></button>`;
       }).join('');
-      const top = s.tab === 'widgets';
+      const c = this.c, top = c.rowTop || s.tab === 'widgets';
       this.el.main.classList.toggle('row-top', top);
-      this.el.row.innerHTML = ROW.map(([a, run]) => `<button class="app${run ? ' run' : ''}" data-app="${a}" aria-label="${a}"><img src="${APP(a)}" alt=""></button>`).join('') + (top ? `<span class="sep"></span><span class="cust">${I('shortcuts')}</span>` : '');
+      const shorts = c.rowShortcuts ? c.rowShortcuts.map(([ic, n]) => `<span class="rsc">${I(ic)}<span>${esc(n)}</span></span>`).join('') + '<span class="sep"></span>' : '';
+      this.el.row.innerHTML = shorts + c.apps.map(([a, run]) => `<button class="app${run ? ' run' : ''}" data-app="${a}" aria-label="${a}"><img src="${APP(a)}" alt=""></button>`).join('') + (top && !c.rowShortcuts ? `<span class="sep"></span><span class="cust">${I('shortcuts')}</span>` : '');
       const cls = dir ? 'in-' + dir : '';
-      this.el.view.innerHTML = `<div class="tab ${cls}">${this['v_' + s.tab]()}</div>`;
+      this.el.view.innerHTML = `<div class="tab ${cls}">${(this['v_' + s.tab] || this.v_empty).call(this)}</div>`;
     }
     v_widgets() {
       const s = this.s, tr = TRACKS[s.ti], f = s.timer / 1500;
@@ -128,12 +173,12 @@
         <div class="wt awake${s.awake ? ' on' : ''}" data-a="awake"><span class="bub">${I('cup')}</span><span><b>Keep Awake</b><small>${s.awake ? 'For 1 hour' : 'Off'}</small></span></div>
       </div>`;
     }
-    v_today() {
-      const s = this.s, m = Math.max(0, Math.round((this.meet - Date.now()) / 6e4));
-      const due = [['Send the invoice', 1], ['Reply to Dana', 0], ['Book flights', 0]];
-      return `<div class="today"><div class="soon"><i></i><span class="cd">in ${m} min</span></div><h3>Design review</h3><div class="when">${t12(this.meet)} · Google Meet</div>
-        <button class="btn-j" data-say="Joining Google Meet" data-ic="videoFill">${I('videoFill')}Join</button>
-        <div class="due"><span class="lbl">Due</span><div style="height:6px"></div>${due.map(([t, od], i) => `<div class="it${od ? ' od' : ''}${s.done[i] ? ' done' : ''}" data-tick="${i}"><span class="ck">${I('check')}</span><span>${t}</span></div>`).join('')}</div></div>`;
+    v_empty() {
+      const t = this.tabs().find(x => x[0] === this.s.tab) || ALL[0];
+      return `<div class="empty"><span>${I(t[2])}</span><b>${esc(t[1])}</b><small>Open VisorPro to see this one.</small></div>`;
+    }
+    v_shortcuts() {
+      return `<div class="scg">${SHORTS.map(([ic, n, acc]) => `<button class="sct" data-say="Ran ${esc(n)}" data-ic="bolt"><span class="${acc ? 'acc' : ''}">${I(ic)}</span><span class="nm">${esc(n)}</span></button>`).join('')}</div>`;
     }
     v_clipboard() {
       const s = this.s;
@@ -176,6 +221,7 @@
     /* ---------- switching ---------- */
     go(tab, how) {
       const s = this.s; if (tab === s.tab) return;
+      const TABS = this.tabs(); if (!TABS.some(t => t[0] === tab)) return;
       const a = TABS.findIndex(t => t[0] === s.tab), b = TABS.findIndex(t => t[0] === tab);
       s.from = how === 'widget' ? 'widgets' : null; s.tab = tab; s.sel = -1;
       this.render(how === 'widget' ? 'z' : b > a ? 'b' : 't', true);
@@ -191,7 +237,7 @@
       let ans = null;
       if (/^[\d\s.+\-*/×÷()^%]+$/.test(q) && /\d/.test(q) && /[+\-*/×÷^%]/.test(q)) { try { const v = Function('"use strict";return (' + q.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**') + ')')(); if (isFinite(v)) ans = Math.round(v * 1e8) / 1e8 } catch (e) { /* not yet a sum */ } }
       if (ans !== null) { h += `<div class="lbl">Answer</div><div class="ans" data-si="0"><b>${ans.toLocaleString('en-US')}</b><span>= ${esc(q)}</span><em>${I('returnKey')}Copy</em></div>`; this.sItems.push(['Copied ' + ans, 'check']) }
-      const tabs = TABS.filter(t => !q || t[1].toLowerCase().includes(q.toLowerCase()));
+      const tabs = this.tabs().filter(t => !q || t[1].toLowerCase().includes(q.toLowerCase()));
       if (q) {
         h += `<div class="lbl">Actions</div>`;
         [['Add Reminder', 'checklist', '#0a84ff', 'Added to Reminders'], ['Add Event', 'calendar', '#ff3b30', 'Event added'], ['Ask', 'sparkle', '#bf5af2', 'Answered on this Mac']].forEach(([n, ic, c, done]) => { const i = this.sItems.length; this.sItems.push([done, 'check']); h += `<div class="sr" data-si="${i}" style="--rc:${c}"><span class="ri">${I(ic)}</span>${n}: ${esc(q)}</div>` });
@@ -205,6 +251,7 @@
 
     /* ---------- the visitor's hands ---------- */
     wire() {
+      if (this.o.shot) return this.wireShot();
       const { hot, notch, pn, rail, view, sin, sres } = this.el;
       let ot, ct, st;
       const reach = () => { clearTimeout(ct); if (!this.s.open) { clearTimeout(ot); ot = setTimeout(() => { this.open(); this.onOpen && this.onOpen() }, 150) } };
@@ -231,8 +278,38 @@
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); return this.openSearch() }
         if (inS) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); this.sSel = clamp(this.sSel + (e.key === 'ArrowDown' ? 1 : -1), 0, this.sItems.length - 1); this.searchMark() } if (e.key === 'Enter') { e.preventDefault(); this.searchRun(this.sSel) } return }
         if (!this.s.open || e.metaKey || e.ctrlKey || e.altKey) return;
-        if (/^[1-5]$/.test(e.key)) { this.go(TABS[+e.key - 1][0]); return }
+        if (/^[1-9]$/.test(e.key)) { const t = this.tabs()[+e.key - 1]; if (t) this.go(t[0]); return }
         if (e.key.length === 1 && /\S/.test(e.key)) { e.preventDefault(); this.openSearch(e.key) }
+      });
+    }
+    /* picture mode: the tab bar's real positions, measured from the app's pictures (13 tabs, 16 pt apart from y 48) */
+    wireShot() {
+      const { hot, notch, pn } = this.el; let ot, ct, st;
+      const ORDER = ['widgets', 'clipboard', 'captures', 'shelf', 'shortcuts', 'calendar', 'tasks', 'notes', 'player', 'translate', 'calculator', 'pomodoro', 'menuBar'];
+      const reach = () => { clearTimeout(ct); if (!this.s.open) { clearTimeout(ot); ot = setTimeout(() => { this.open(); this.onOpen && this.onOpen() }, 150) } };
+      const keep = el => el && (hot.contains(el) || notch.contains(el) || (this.o.keep && this.o.keep.contains(el)));
+      [hot, notch].forEach(e => { e.addEventListener('mouseenter', reach); e.addEventListener('click', () => { this.s.open ? this.close() : this.open() }) });
+      hot.addEventListener('mouseleave', () => clearTimeout(ot));
+      pn.addEventListener('mouseenter', () => clearTimeout(ct));
+      pn.addEventListener('mouseleave', e => { if (this.s.pinned || !this.s.open || keep(e.relatedTarget)) return; ct = setTimeout(() => this.close(), 450) });
+      if (this.o.keep) { this.o.keep.addEventListener('mouseenter', () => clearTimeout(ct)); this.o.keep.addEventListener('mouseleave', e => { if (!this.s.pinned && this.s.open && !pn.contains(e.relatedTarget)) ct = setTimeout(() => this.close(), 450) }) }
+      const at = e => { const img = pn.querySelector('.pimg:last-child'); const r = img.getBoundingClientRect(); const w = img.naturalWidth / 2, h = img.naturalHeight / 2; return [(e.clientX - r.left) / r.width * w, (e.clientY - r.top) / r.height * h] };
+      pn.addEventListener('mousemove', e => {
+        if (!this.s.open || !this.shot.startsWith('tab-') && this.shot !== 'search') return;
+        const [x, y] = at(e);
+        if (x < 36 || x > 84 || y < 38) return;
+        const i = clamp(Math.round((y - 48) / 16), 0, ORDER.length - 1), id = ORDER[i];
+        if (('tab-' + id) === this.shot) return;
+        clearTimeout(st); st = setTimeout(() => { this.s.tab = id; this.setShot('tab-' + id, 'f'); this.onTab && this.onTab(id) }, 50);
+      });
+      pn.addEventListener('click', e => { const [x, y] = at(e); if (y < 30 && x > 520 && x < 556) this.setShot(this.shot === 'search' ? 'tab-' + this.s.tab : 'search', 'f') });
+      this.root.addEventListener('pointerdown', e => { VP.activeMac = this; if (this.s.open && !this.s.pinned && !pn.contains(e.target) && !keep(e.target)) this.close() });
+      this.root.addEventListener('mouseenter', () => { VP.activeMac = this });
+      document.addEventListener('keydown', e => {
+        if (VP.activeMac !== this || (e.target.closest && e.target.closest('input,textarea,select'))) return;
+        if (e.key === 'Escape') { if (this.shot === 'search') this.setShot('tab-' + this.s.tab, 'f'); else this.close(); return }
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (!this.s.open) this.open(); this.setShot('search', 'f'); return }
+        if (this.s.open && /^[1-9]$/.test(e.key) && !e.metaKey) { const id = ORDER[+e.key - 1]; this.s.tab = id; this.setShot('tab-' + id, 'f') }
       });
     }
     act(e) {

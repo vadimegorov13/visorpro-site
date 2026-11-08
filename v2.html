@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 2 · Desktop</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 2 · Desktop: the whole page is a Mac desktop. No scrolling: the story lives in windows you can drag,
+     a Dock opens them, and the real panel drops from the notch in the menu bar. */
+  :root { --mb-h: calc(32px * var(--s, 1)); }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; overflow: hidden; font: 14px/1.5 -apple-system, BlinkMacSystemFont, Inter, sans-serif; color: #1d1d1f; -webkit-font-smoothing: antialiased;
+    background: #3a2a6b; }
+  .x-wall { position: fixed; inset: 0; overflow: hidden;
+    background: radial-gradient(90% 70% at 15% 105%, #ff8a5c 0%, transparent 55%), radial-gradient(70% 70% at 95% 90%, #ff4f9a 0%, transparent 55%),
+                radial-gradient(80% 60% at 60% 0%, #6a5cff 0%, transparent 60%), linear-gradient(160deg, #2b2370, #7b3f8f 60%, #e2706a); }
+  .x-wall::before, .x-wall::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; }
+  .x-wall::before { width: 60vw; height: 30vw; left: -10vw; top: 45vh; background: #ffb36b; transform: rotate(-12deg); }
+  .x-wall::after { width: 50vw; height: 24vw; right: -12vw; top: 20vh; background: #b04cff; transform: rotate(18deg); }
+
+  .x-mb { position: fixed; top: 0; left: 0; right: 0; height: var(--mb-h); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 40;
+    color: #fff; font-size: 13px; background: rgba(20, 10, 40, .22); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); }
+  .x-mb > div { display: flex; align-items: center; gap: 20px; }
+  .x-mb a, .x-mb button { color: inherit; text-decoration: none; background: none; border: 0; font: inherit; cursor: pointer; padding: 2px 6px; border-radius: 5px; }
+  .x-mb a:hover, .x-mb button:hover { background: rgba(255, 255, 255, .18); }
+  .x-mb .x-app { font-weight: 700; display: flex; gap: 8px; align-items: center; }
+  .x-mb .i { width: 15px; height: 15px; display: block; }
+  .x-mb .x-buy { background: rgba(255, 255, 255, .92); color: #2b2370; font-weight: 600; padding: 2px 10px; }
+  .x-mb .x-buy:hover { background: #fff; }
+  @media (max-width: 900px) { .x-mb .x-menus, .x-mb .x-st { display: none; } }
+
+  /* Windows */
+  .x-w { position: absolute; background: rgba(250, 249, 252, .9); -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8);
+    border-radius: 14px; box-shadow: 0 0 0 .5px rgba(0, 0, 0, .25), 0 30px 70px -20px rgba(20, 0, 50, .6), 0 10px 20px -10px rgba(20, 0, 50, .4);
+    overflow: hidden; z-index: 10; transition: opacity .2s, transform .2s; }
+  .x-w.hide { opacity: 0; transform: scale(.94); pointer-events: none; }
+  .x-bar { height: 38px; display: flex; align-items: center; justify-content: center; position: relative; cursor: grab; user-select: none; font-weight: 600; font-size: 13px; color: #555; border-bottom: 1px solid rgba(0, 0, 0, .06); }
+  .x-bar:active { cursor: grabbing; }
+  .x-dots { position: absolute; left: 14px; top: 13px; display: flex; gap: 8px; }
+  .x-dots button { width: 12px; height: 12px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: #ff5f57; }
+  .x-dots button:nth-child(2) { background: #febc2e; } .x-dots button:nth-child(3) { background: #28c840; }
+  .x-in { padding: 24px 28px 26px; }
+  .x-hello h1 { font: 800 40px/1.05 Inter, sans-serif; letter-spacing: -.035em; margin: 0 0 12px; color: #1b1340; }
+  .x-hello h1 span { background: linear-gradient(90deg, #ff4f9a, #ff9a3d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .x-hello p { margin: 0 0 18px; color: #4b4560; font-size: 15px; }
+  .x-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: 10px; font-weight: 600; font-size: 14.5px; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; }
+  .x-btn.p { background: linear-gradient(90deg, #ff4f9a, #ff7a59); color: #fff; box-shadow: 0 8px 20px -8px #ff4f9a; }
+  .x-btn.g { background: rgba(0, 0, 0, .06); color: #1b1340; }
+  .x-btn s { opacity: .7; font-weight: 400; }
+  .x-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .x-small { margin-top: 14px; font-size: 12.5px; color: #7a7490; }
+
+  .x-sticky { position: absolute; width: 230px; padding: 16px 18px 18px; background: #fff3a8; color: #3d3510; border-radius: 4px; box-shadow: 0 16px 30px -12px rgba(0, 0, 0, .45); transform: rotate(2deg); z-index: 9; cursor: grab; user-select: none; }
+  .x-sticky b { display: block; font-size: 15px; margin-bottom: 8px; }
+  .x-sticky button { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; color: inherit; padding: 4px 0; cursor: pointer; }
+  .x-sticky button:hover { text-decoration: underline; }
+
+  .x-plist { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 6px; }
+  .x-plist li { position: relative; padding-left: 22px; } .x-plist li::before { content: "✓"; position: absolute; left: 0; color: #ff4f9a; font-weight: 700; }
+  .x-amt { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .x-amt b { font: 800 46px/1 Inter; letter-spacing: -.04em; color: #1b1340; } .x-amt s { color: #8a849c; }
+  .x-faq details { border-bottom: 1px solid rgba(0, 0, 0, .08); padding: 10px 0; }
+  .x-faq summary { cursor: pointer; font-weight: 600; }
+  .x-faq p { margin: 6px 0 2px; color: #4b4560; }
+  .x-faq .x-in { max-height: 340px; overflow: auto; padding-top: 10px; }
+
+  /* Desktop icons */
+  .x-icons { position: absolute; right: 22px; top: calc(var(--mb-h) + 20px); display: grid; gap: 18px; z-index: 5; }
+  .x-icon { width: 86px; display: grid; justify-items: center; gap: 5px; background: none; border: 0; cursor: pointer; color: #fff; font: 500 12px Inter, sans-serif; text-shadow: 0 1px 3px rgba(0, 0, 0, .5); padding: 6px 2px; border-radius: 8px; }
+  .x-icon:hover, .x-icon.on { background: rgba(255, 255, 255, .16); }
+  .x-icon i { width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; font-style: normal; color: #fff; box-shadow: 0 8px 18px -6px rgba(0, 0, 0, .5); }
+  .x-icon i .i { width: 26px; height: 26px; display: block; }
+
+  /* Dock */
+  .x-dock { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; gap: 10px; padding: 8px 10px; border-radius: 22px; z-index: 30;
+    background: rgba(255, 255, 255, .2); -webkit-backdrop-filter: blur(30px) saturate(1.6); backdrop-filter: blur(30px) saturate(1.6); box-shadow: 0 0 0 .5px rgba(255, 255, 255, .35) inset, 0 10px 30px rgba(0, 0, 0, .25); }
+  .x-dock button { position: relative; width: 54px; height: 54px; border-radius: 13px; border: 0; cursor: pointer; display: grid; place-items: center; color: #fff; transition: transform .18s; transform-origin: 50% 100%; }
+  .x-dock button:hover { transform: scale(1.3) translateY(-4px); }
+  .x-dock button .i { width: 26px; height: 26px; display: block; }
+  .x-dock button::after { content: attr(data-name); position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(30, 30, 36, .85); color: #fff; font-size: 12px; padding: 3px 9px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: .12s; }
+  .x-dock button:hover::after { opacity: 1; }
+  .x-dock .x-sep { width: 1px; background: rgba(255, 255, 255, .35); margin: 6px 2px; }
+
+  @media (max-width: 820px) {
+    body { overflow: auto; }
+    .x-desk { position: relative; padding: calc(var(--panel-h) + 20px) 12px 110px; display: grid; gap: 14px; }
+    .x-w, .x-sticky { position: relative !important; left: auto !important; top: auto !important; width: auto !important; transform: none; }
+    .x-w.hide { display: none; }
+    .x-icons { display: none; }
+    .x-hello h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="x-wall"></div>
+<header class="x-mb">
+  <div><span class="x-app"><span data-mark="16"></span>VisorPro</span><span class="x-menus"><button data-win="w-hello">About</button><button data-win="w-price">Price</button><button data-win="w-faq">Help</button></span></div>
+  <div><span class="x-st"><span data-i="wifi"></span></span><span class="x-st"><span data-i="battery"></span></span><span class="x-st" id="clk"></span><a class="x-buy" href="checkout.html">Buy <span data-price></span></a></div>
+</header>
+
+<div class="x-desk">
+  <section class="x-w" id="w-hello" style="left:4vw;top:calc(var(--panel-h) + 34px);width:470px">
+    <div class="x-bar"><span class="x-dots"><button data-close aria-label="Close"></button><button data-close aria-label="Minimise"></button><button aria-label="Zoom"></button></span>Welcome</div>
+    <div class="x-in x-hello">
+      <h1>This notch now<br><span>does things.</span></h1>
+      <p>Look up. Point at the black notch in the menu bar, it’s real. Your clipboard, calendar, reminders, music and timers drop out of it, and fold away when you move on.</p>
+      <div class="x-row"><a class="x-btn p" href="checkout.html">Buy · <span data-price></span> <s data-price-was></s></a><button class="x-btn g" data-win="w-price">Free trial</button></div>
+      <div class="x-small">Pay once · no account · stays on your Mac · macOS 13+</div>
+    </div>
+  </section>
+
+  <aside class="x-sticky" id="w-try" style="left:calc(4vw + 510px);top:calc(var(--panel-h) + 90px)">
+    <b>Things to try ✍︎</b>
+    <button data-open-tab="clipboard">→ copy something old again</button>
+    <button data-open-tab="tasks">→ tick off “Reply to Dana”</button>
+    <button data-open-tab="player">→ drag the music along</button>
+    <button data-open-search="10m tea">→ search “10m tea”</button>
+    <button data-open-tab="menubar">→ find the hidden icons</button>
+  </aside>
+
+  <section class="x-w hide" id="w-price" style="right:140px;top:calc(var(--panel-h) + 20px);width:360px">
+    <div class="x-bar"><span class="x-dots"><button data-close aria-label="Close"></button><button data-close aria-label="Minimise"></button><button aria-label="Zoom"></button></span>Price</div>
+    <div class="x-in">
+      <div class="x-amt"><b data-price></b><s data-price-was></s></div>
+      <div class="x-small" style="margin:0 0 16px">one-time · early price</div>
+      <ul class="x-plist"><li>All 13 tabs, every look</li><li>Every version 1 update</li><li>On <span data-macs></span> Macs</li><li><span data-trial></span>-day trial, no card</li></ul>
+      <div class="x-row"><a class="x-btn p" href="checkout.html">Buy VisorPro</a><a class="x-btn g" href="#">Download trial</a></div>
+    </div>
+  </section>
+
+  <section class="x-w x-faq hide" id="w-faq" style="left:calc(50vw - 230px);top:calc(var(--mb-h) + 60px);width:460px">
+    <div class="x-bar"><span class="x-dots"><button data-close aria-label="Close"></button><button data-close aria-label="Minimise"></button><button aria-label="Zoom"></button></span>Questions</div>
+    <div class="x-in" data-faq="8"></div>
+  </section>
+
+  <nav class="x-icons" aria-label="Desktop">
+    <button class="x-icon" data-win="w-hello"><i style="background:linear-gradient(#ff7aa8,#ff4f9a)"><span data-i="sparkle"></span></i>Welcome</button>
+    <button class="x-icon" data-win="w-price"><i style="background:linear-gradient(#ffc36b,#ff8a3d)"><span data-i="tag"></span></i>Price</button>
+    <button class="x-icon" data-win="w-faq"><i style="background:linear-gradient(#7aa8ff,#5e5ce6)"><span data-i="info"></span></i>Questions</button>
+    <button class="x-icon" data-win="w-try"><i style="background:linear-gradient(#fff3a8,#ffd84a);color:#5a4a00"><span data-i="notes"></span></i>Try this</button>
+  </nav>
+</div>
+
+<nav class="x-dock" aria-label="Dock">
+  <button data-name="Welcome" data-win="w-hello" style="background:linear-gradient(#ff7aa8,#ff4f9a)"><span data-i="sparkle"></span></button>
+  <button data-name="Clipboard" data-open-tab="clipboard" style="background:linear-gradient(#ffc04d,#ff9f0a)"><span data-i="clipboard"></span></button>
+  <button data-name="Calendar" data-open-tab="calendar" style="background:linear-gradient(#ff7b70,#ff453a)"><span data-i="calendar"></span></button>
+  <button data-name="Reminders" data-open-tab="tasks" style="background:linear-gradient(#8fe0ff,#3cb8e6)"><span data-i="checklist"></span></button>
+  <button data-name="Music" data-open-tab="player" style="background:linear-gradient(#7af0ea,#24b8b2)"><span data-i="player"></span></button>
+  <button data-name="Clock" data-open-tab="clock" style="background:linear-gradient(#6ee08a,#24a84a)"><span data-i="clock"></span></button>
+  <span class="x-sep"></span>
+  <button data-name="Price" data-win="w-price" style="background:linear-gradient(#ffc36b,#ff8a3d)"><span data-i="tag"></span></button>
+  <button data-name="Questions" data-win="w-faq" style="background:linear-gradient(#7aa8ff,#5e5ce6)"><span data-i="info"></span></button>
+</nav>
+
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount();
+  VP.kit.fill();
+  const clk = () => { document.getElementById('clk').textContent = new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); };
+  clk(); setInterval(clk, 15000);
+
+  // Windows: bring to front on touch, drag by the title bar, close with the red button, open from the icons and the Dock.
+  let z = 20;
+  const front = (w) => { w.style.zIndex = ++z; };
+  document.querySelectorAll('.x-w, .x-sticky').forEach((w) => {
+    w.addEventListener('pointerdown', () => front(w));
+    const handle = w.classList.contains('x-sticky') ? w : w.querySelector('.x-bar');
+    handle.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('button') || innerWidth <= 820) return;
+      const r = w.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      w.style.right = 'auto';
+      const move = (m) => { w.style.left = Math.max(-r.width + 80, Math.min(innerWidth - 80, m.clientX - dx)) + 'px'; w.style.top = Math.max(30, Math.min(innerHeight - 60, m.clientY - dy)) + 'px'; };
+      const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); };
+      addEventListener('pointermove', move); addEventListener('pointerup', up);
+    });
+    w.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => w.classList.add('hide')));
+  });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-win]'); if (!b) return;
+    const w = document.getElementById(b.dataset.win); w.classList.remove('hide'); front(w);
+    if (innerWidth <= 820) w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  VP.kit.autoOpen(800);
+</script>
+</body>
+</html>

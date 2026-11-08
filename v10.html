@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 10 · Blueprint</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 10 · Blueprint: a technical drawing of the panel. Grid paper in cobalt, white linework, handwritten notes with
+     arrows to each part, and the panel itself pinned open in the middle, working. */
+  :root { --bp: #123f9c; --bp2: #0e3384; --ln: rgba(255, 255, 255, .85); --ln2: rgba(255, 255, 255, .16); --hl: #ffd84a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #fff; font: 15px/1.6 "Space Mono", ui-monospace, monospace; -webkit-font-smoothing: antialiased; background-color: var(--bp);
+    background-image: linear-gradient(var(--ln2) 1px, transparent 1px), linear-gradient(90deg, var(--ln2) 1px, transparent 1px),
+                      linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px; }
+  .x-w { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+  .x-hand { font-family: Caveat, cursive; }
+  .x-top { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; border-bottom: 2px solid var(--ln); }
+  .x-top b { font-size: 18px; letter-spacing: .12em; }
+  .x-top a { color: var(--bp); background: var(--hl); padding: 8px 14px; text-decoration: none; font-weight: 700; }
+  .x-title { display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: end; padding: 40px 0 10px; }
+  .x-title h1 { font: 700 clamp(56px, 8vw, 104px)/.9 Caveat, cursive; margin: 0; }
+  .x-title h1 span { color: var(--hl); }
+  .x-title p { margin: 12px 0 0; max-width: 40em; opacity: .85; }
+  .x-stamp { border: 2px solid var(--ln); padding: 10px 14px; font-size: 12px; line-height: 1.5; min-width: 230px; }
+  .x-stamp b { display: block; font-size: 13px; }
+
+  .x-stage { position: relative; margin: 40px 0 0; border: 2px dashed var(--ln); height: calc(var(--panel-h, 330px) + 150px); }
+  .x-stage::before { content: "FIG. 1 — THE PANEL, PINNED OPEN (WORKING)"; position: absolute; left: 12px; bottom: 10px; font-size: 12px; opacity: .8; letter-spacing: .08em; }
+  .x-ann { position: absolute; font: 700 25px/1.05 Caveat, cursive; color: #fff; white-space: nowrap; pointer-events: none; transition: opacity .3s; }
+  .x-ann i { font-style: normal; color: var(--hl); }
+  .x-ann svg { position: absolute; overflow: visible; }
+  .x-ann path { fill: none; stroke: var(--hl); stroke-width: 2; stroke-linecap: round; }
+  @media (max-width: 1080px) { .x-ann { display: none; } }
+  .x-dim { position: absolute; top: -26px; height: 16px; border-left: 1.5px solid var(--ln); border-right: 1.5px solid var(--ln); font-size: 11px; text-align: center; }
+  .x-dim::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; border-top: 1.5px solid var(--ln); }
+  .x-dim span { position: relative; background: var(--bp); padding: 0 6px; top: -4px; }
+
+  .x-try { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+  .x-try button { font: inherit; font-size: 13px; color: #fff; background: var(--bp2); border: 1.5px solid var(--ln); padding: 6px 12px; cursor: pointer; }
+  .x-try button:hover { background: var(--hl); color: var(--bp); border-color: var(--hl); }
+
+  .x-spec { display: grid; grid-template-columns: 1.3fr 1fr; gap: 0; border: 2px solid var(--ln); margin: 70px 0 0; }
+  .x-spec > div { padding: 26px 28px; } .x-spec > div + div { border-left: 2px solid var(--ln); }
+  .x-spec h2 { font: 700 44px/1 Caveat; margin: 0 0 14px; }
+  .x-spec table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .x-spec td { padding: 7px 0; border-bottom: 1px solid var(--ln2); vertical-align: top; } .x-spec td:first-child { opacity: .7; width: 42%; }
+  .x-price b { display: block; font: 700 96px/.9 Caveat; color: var(--hl); } .x-price s { opacity: .6; }
+  .x-price p { margin: 10px 0 18px; opacity: .85; }
+  .x-btn { display: inline-block; background: var(--hl); color: var(--bp); font-weight: 700; padding: 13px 20px; text-decoration: none; box-shadow: 5px 5px 0 rgba(0, 0, 0, .25); }
+  .x-btn:hover { transform: translate(-1px, -1px); }
+  .x-btn.o { background: none; color: #fff; box-shadow: inset 0 0 0 2px var(--ln); margin-left: 8px; }
+  .x-faq { margin: 60px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+  .x-faq h2 { grid-column: 1 / -1; font: 700 44px/1 Caveat; margin: 0 0 10px; }
+  .x-faq details { border-bottom: 1px dashed var(--ln); padding: 12px 0; } .x-faq summary { cursor: pointer; font-weight: 700; } .x-faq p { opacity: .8; margin: 8px 0 0; font-size: 14px; }
+  .x-foot { margin: 50px 0 0; padding: 20px 0 40px; border-top: 2px solid var(--ln); display: flex; justify-content: space-between; font-size: 13px; } .x-foot a { color: inherit; }
+  @media (max-width: 860px) { .x-title, .x-spec, .x-faq { grid-template-columns: 1fr; } .x-spec > div + div { border-left: 0; border-top: 2px solid var(--ln); } .x-stamp { display: none; } }
+</style>
+</head>
+<body>
+<div class="x-w">
+  <header class="x-top"><b>VISORPRO</b><a href="checkout.html">BUY <span data-price></span></a></header>
+  <section class="x-title">
+    <div><h1>How the notch <span>works for you.</span></h1><p>Everything VisorPro adds to your MacBook lives in this one panel. It drops from the notch when you point at it and folds away when you leave. The drawing below is the real thing: click anything in it.</p></div>
+    <div class="x-stamp"><b>DWG. VP-001</b>Part: VisorPro panel<br>Fits: every Mac, notch or not<br>Requires: macOS 13+<br>Scale: 1 : 1</div>
+  </section>
+
+  <div class="x-stage" id="stage">
+    <div class="x-dim" id="dim"><span>620 pt</span></div>
+    <div class="x-ann" id="a-notch"><i>①</i> point here.<br>it opens by itself</div>
+    <div class="x-ann" id="a-rail"><i>②</i> slide down these:<br>tabs switch as you pass</div>
+    <div class="x-ann" id="a-search"><i>③</i> ⌘K finds anything,<br>does sums, starts timers</div>
+    <div class="x-ann" id="a-apps"><i>④</i> your apps, one click</div>
+    <div class="x-ann" id="a-body"><i>⑤</i> live: music plays,<br>timers count, ticks stick</div>
+  </div>
+  <div class="x-try"><button data-open-tab="clipboard">→ Clipboard</button><button data-open-tab="calendar">→ Calendar</button><button data-open-tab="tasks">→ Reminders</button><button data-open-tab="clock">→ Pomodoro</button><button data-open-tab="menubar">→ hidden icons</button><button data-open-search="5 km to mi">→ search “5 km to mi”</button><button data-look-set="liquid">→ Liquid look</button><button data-look-set="studio">→ Studio look</button></div>
+
+  <section class="x-spec" id="price">
+    <div><h2>Specification</h2><table>
+      <tr><td>Tabs</td><td>13: Widgets, Clipboard, Captures, Shelf, Shortcuts, Calendar, Reminders, Notes, Player, Translate, Calculator, Clock, Menu Bar</td></tr>
+      <tr><td>Opens by</td><td>pointing, clicking, ⌃⌥⌘M, dragging a file up, scrolling at the top edge</td></tr>
+      <tr><td>Looks</td><td>Studio, Liquid Glass, Tinted, Notch Fade · any colour</td></tr>
+      <tr><td>CPU while closed</td><td>0%</td></tr>
+      <tr><td>Screen sharing</td><td>never shows</td></tr>
+      <tr><td>Data</td><td>stays on your Mac · no account</td></tr>
+    </table></div>
+    <div class="x-price"><h2>Price</h2><b data-price></b><s data-price-was></s> early price<p>Once. Every version 1 update. <span data-macs></span> Macs. Refunds within 14 days.</p><a class="x-btn" href="checkout.html">Buy VisorPro</a><a class="x-btn o" href="#"><span data-trial></span>-day trial</a></div>
+  </section>
+  <section class="x-faq"><h2>Notes &amp; questions</h2><div data-faq="6" style="display:contents"></div></section>
+  <footer class="x-foot"><span>VisorPro · Mac Utilities Suite</span><a href="mailto:hello@visorpro.app">hello@visorpro.app</a></footer>
+</div>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  const stage = document.getElementById('stage');
+  VP.demo.mount({ host: stage, fit: .58, max: 1.15, min: .5, margin: 0, accent: '#ffd84a' });
+  VP.kit.fill();
+  VP.demo.open(); VP.demo.pin(true);
+
+  // Lay the notes and arrows out around wherever the panel ends up at this width.
+  const arrow = (x1, y1, x2, y2) => { const mx = (x1 + x2) / 2, my = Math.min(y1, y2) - 30; return `<svg width="1" height="1" style="left:0;top:0"><path d="M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}"/><path d="M${x2} ${y2} l${x1 < x2 ? -9 : 9} -5 M${x2} ${y2} l${x1 < x2 ? -4 : 4} -10"/></svg>`; };
+  function layout() {
+    const s = stage.getBoundingClientRect(), shape = stage.querySelector('.vp-shape').getBoundingClientRect();
+    const L = shape.left - s.left, T = shape.top - s.top, W = shape.width, H = shape.height, sc = W / 620;
+    const dim = document.getElementById('dim'); dim.style.left = L + 'px'; dim.style.width = W + 'px';
+    const put = (id, x, y, tx, ty, alignRight) => {
+      const a = document.getElementById(id); a.style.left = x + 'px'; a.style.top = y + 'px';
+      const r = a.getBoundingClientRect(); const ox = alignRight ? r.width : 0;
+      a.innerHTML = a.innerHTML.replace(/<svg[\s\S]*<\/svg>/, '') + arrow(ox + (alignRight ? 8 : -8), 14, tx - x, ty - y);
+    };
+    put('a-notch', L - 250, 20, L + W / 2 - 100 * sc, 14 * sc, true);
+    put('a-rail', L - 260, T + 150 * sc, L + 26 * sc, T + 170 * sc, true);
+    put('a-apps', L - 230, T + H - 20, L + 120 * sc, T + H - 30 * sc, true);
+    put('a-search', L + W + 40, 18, L + W - 66 * sc, 18 * sc, false);
+    put('a-body', L + W + 40, T + 170 * sc, L + W - 40 * sc, T + 180 * sc, false);
+  }
+  setTimeout(layout, 600); addEventListener('resize', () => setTimeout(layout, 50));
+</script>
+</body>
+</html>

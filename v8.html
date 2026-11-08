@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 8 · A day with it</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 8 · A day with it: one workday on a timeline. Pick a moment and the sky behind the page changes to that hour
+     while the real panel opens on what you’d reach for then. */
+  :root { --ink: #fff; --ink2: rgba(255, 255, 255, .74); }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); font: 16px/1.55 Sora, system-ui, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; background: #1a1240; }
+  .x-sky { position: fixed; inset: 0; z-index: -1; transition: background 1.2s ease; }
+  body[data-t="0"] .x-sky { background: linear-gradient(#ffb88a, #ff8fa3 45%, #7a6cf0); }
+  body[data-t="1"] .x-sky { background: linear-gradient(#6cc4ff, #8fb4ff 50%, #d9a6ff); }
+  body[data-t="2"] .x-sky { background: linear-gradient(#3aa3ff, #67d1ff 55%, #ffe39a); }
+  body[data-t="3"] .x-sky { background: linear-gradient(#ff9a6b, #f2647f 50%, #6a3fb8); }
+  body[data-t="4"] .x-sky { background: linear-gradient(#ff6f61, #9b4ccf 55%, #2b1e6b); }
+  body[data-t="5"] .x-sky { background: linear-gradient(#0f1238, #2a1d6b 60%, #5a2b8a); }
+  .x-sun { position: fixed; z-index: -1; width: 240px; height: 240px; border-radius: 50%; filter: blur(4px); transition: left 1.2s ease, top 1.2s ease, background 1.2s; background: radial-gradient(circle, #fff6d6, #ffd36e 50%, transparent 70%); }
+  body[data-t="5"] .x-sun { background: radial-gradient(circle, #f4f1ff, #c9c3ff 40%, transparent 68%); }
+
+  .x-w { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+  .x-top { display: flex; justify-content: space-between; align-items: center; height: calc(32px * var(--s, 1) + 16px); padding: 0 24px; font-weight: 700; text-shadow: 0 1px 8px rgba(0, 0, 0, .15); }
+  .x-top > span { display: flex; gap: 10px; align-items: center; }
+  .x-top a { white-space: nowrap; }
+  .x-top a { color: #fff; text-decoration: none; background: rgba(0, 0, 0, .18); padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; }
+  .x-hero { padding: calc(var(--panel-h, 330px) + 10px) 0 0; text-align: center; text-shadow: 0 2px 20px rgba(40, 0, 60, .2); }
+  .x-hero h1 { font: 800 clamp(38px, 5.4vw, 72px)/1 Sora; letter-spacing: -.045em; margin: 0 0 12px; }
+  .x-hero p { color: var(--ink2); font-size: 18px; margin: 0 auto; max-width: 34em; }
+  .x-hero b { color: #fff; }
+
+  /* The day */
+  .x-day { position: relative; margin: 40px 0 0; }
+  .x-track { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; position: relative; }
+  .x-track::before { content: ""; position: absolute; left: 0; right: 0; top: 22px; height: 2px; background: rgba(255, 255, 255, .35); }
+  .x-m { position: relative; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; padding: 0; font: inherit; }
+  .x-m .t { display: inline-flex; align-items: center; gap: 8px; height: 46px; font-weight: 700; font-size: 15px; }
+  .x-m .t::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: rgba(255, 255, 255, .5); box-shadow: 0 0 0 4px rgba(255, 255, 255, .15); transition: .3s; }
+  .x-m .c { display: block; padding: 18px; border-radius: 20px; background: rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, .22); min-height: 170px; transition: .3s; }
+  .x-m b { display: block; font-size: 17px; line-height: 1.25; margin-bottom: 8px; }
+  .x-m span.d { color: var(--ink2); font-size: 14px; }
+  .x-m:hover .c { background: rgba(255, 255, 255, .22); }
+  .x-m.on .t::before { background: #fff; box-shadow: 0 0 0 6px rgba(255, 255, 255, .35), 0 0 20px #fff; }
+  .x-m.on .c { background: rgba(255, 255, 255, .92); color: #2a1a55; transform: translateY(-6px); box-shadow: 0 20px 40px -16px rgba(40, 0, 80, .5); }
+  .x-m.on span.d { color: #5b4a85; }
+  .x-auto { text-align: center; margin-top: 18px; font-size: 14px; color: var(--ink2); }
+  .x-auto button { background: none; border: 0; color: #fff; font: inherit; text-decoration: underline; cursor: pointer; }
+
+  .x-buy { margin: 80px auto 0; max-width: 900px; display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center; padding: 34px 38px; border-radius: 30px; background: rgba(20, 10, 50, .5); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, .18); }
+  .x-buy h2 { font: 800 34px/1.1 Sora; letter-spacing: -.035em; margin: 0 0 8px; }
+  .x-buy p { margin: 0; color: var(--ink2); }
+  .x-amt { text-align: right; } .x-amt b { display: block; font-size: 48px; font-weight: 800; letter-spacing: -.04em; line-height: 1; } .x-amt s { color: var(--ink2); }
+  .x-btn { display: inline-block; margin-top: 12px; padding: 14px 24px; border-radius: 999px; background: #fff; color: #2a1a55; font-weight: 700; text-decoration: none; }
+  .x-btn:hover { transform: translateY(-1px); }
+  .x-faq { max-width: 900px; margin: 50px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .x-faq details { background: rgba(20, 10, 50, .35); border-radius: 16px; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, .12); }
+  .x-faq summary { cursor: pointer; font-weight: 600; } .x-faq p { color: var(--ink2); margin: 8px 0 0; font-size: 15px; }
+  .x-foot { text-align: center; padding: 50px 0 40px; color: var(--ink2); font-size: 14px; } .x-foot a { color: inherit; }
+  @media (max-width: 980px) {
+    .x-track { grid-template-columns: repeat(6, 78%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+    .x-m { scroll-snap-align: start; } .x-buy, .x-faq { grid-template-columns: 1fr; } .x-amt { text-align: left; }
+  }
+</style>
+</head>
+<body data-t="0">
+<div class="x-sky"></div><div class="x-sun" id="sun"></div>
+<header class="x-top"><span><span data-mark="22"></span>VisorPro</span><a href="checkout.html">Buy · <span data-price></span></a></header>
+<div class="x-w">
+  <section class="x-hero">
+    <h1>Your day, one point away.</h1>
+    <p>Pick a moment. The panel above opens on what you’d reach for then. It’s the real thing, so <b>click around in it</b>.</p>
+  </section>
+  <section class="x-day">
+    <div class="x-track" id="track">
+      <button class="x-m on" data-k="0" data-open-tab="widgets"><span class="t">8:40</span><span class="c"><b>Coffee, music on, glance at the day.</b><span class="d">Widgets: now playing, next up, a timer and your reminders on one page.</span></span></button>
+      <button class="x-m" data-k="1" data-open-tab="calendar"><span class="t">9:58</span><span class="c"><b>Standup in 2 minutes.</b><span class="d">Calendar shows the countdown. Join is one click, from any app.</span></span></button>
+      <button class="x-m" data-k="2" data-open-tab="clock"><span class="t">11:00</span><span class="c"><b>Heads down for 25.</b><span class="d">Start a Pomodoro. It counts down in the notch while you work.</span></span></button>
+      <button class="x-m" data-k="3" data-open-tab="clipboard"><span class="t">14:20</span><span class="c"><b>Paste the address from this morning.</b><span class="d">Clipboard kept it, and everything else you copied today.</span></span></button>
+      <button class="x-m" data-k="4" data-open-tab="tasks"><span class="t">17:45</span><span class="c"><b>Tick off the day.</b><span class="d">Reminders, synced with your iPhone. Add “call mum tomorrow”.</span></span></button>
+      <button class="x-m" data-k="5" data-open-tab="menubar"><span class="t">22:10</span><span class="c"><b>Find the VPN icon the notch hid.</b><span class="d">Menu Bar lists every icon, with its menu one click away.</span></span></button>
+    </div>
+    <div class="x-auto">Playing through the day on its own. <button id="stop">Stop</button></div>
+  </section>
+
+  <section class="x-buy" id="price">
+    <div><h2>Every day, for one price.</h2><p>Pay once. No account, nothing leaves your Mac. <span data-macs></span> Macs, <span data-trial></span>-day free trial, refunds within 14 days.</p></div>
+    <div class="x-amt"><b data-price></b><s data-price-was></s><br><a class="x-btn" href="checkout.html">Buy VisorPro</a></div>
+  </section>
+  <section class="x-faq" data-faq="6"></section>
+  <footer class="x-foot">VisorPro · Mac Utilities Suite · <a href="mailto:hello@visorpro.app">hello@visorpro.app</a></footer>
+</div>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount({ look: 'liquid', accent: '#ff6fae' });
+  VP.kit.fill();
+  const SUN = [[8, 70], [22, 30], [46, 12], [70, 28], [86, 62], [78, 18]];
+  const ms = [...document.querySelectorAll('.x-m')];
+  let k = 0, auto = true, timer;
+  function go(n, openIt) {
+    k = n; document.body.dataset.t = n;
+    ms.forEach((m) => m.classList.toggle('on', +m.dataset.k === n));
+    const [x, y] = SUN[n], sun = document.getElementById('sun');
+    sun.style.left = `calc(${x}vw - 120px)`; sun.style.top = `calc(${y}vh - 120px)`;
+    if (openIt) VP.demo.setTab(ms[n].dataset.openTab);
+  }
+  function stop() { auto = false; clearInterval(timer); document.querySelector('.x-auto').style.visibility = 'hidden'; }
+  document.getElementById('track').addEventListener('click', (e) => { const m = e.target.closest('.x-m'); if (m) { stop(); go(+m.dataset.k, false); } });
+  document.getElementById('stop').addEventListener('click', stop);
+  // Anyone clicking in the panel takes over from the slideshow.
+  document.addEventListener('pointerdown', (e) => { if (e.target.closest('.vp')) stop(); });
+  go(0, false);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setTimeout(() => { VP.demo.open('widgets'); if (!reduce) timer = setInterval(() => { if (!auto) return; if (document.querySelector('.vp').matches(':hover')) return; go((k + 1) % 6, true); }, 4200); }, 700);
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 5 · Terminal</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 5 · Terminal: for people who live in the keyboard. A prompt drives the real panel: open tabs, run sums,
+     start timers, change the look, buy. Deep navy, phosphor green, amber. */
+  :root { --bg: #070b18; --bg2: #0d1428; --fg: #c9d4f0; --dim: #5e6b8f; --g: #6dffb0; --a: #ffb547; --p: #ff6fae; --line: #1c2646; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.65 "JetBrains Mono", ui-monospace, monospace; -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(70% 40% at 50% 0%, rgba(109, 255, 176, .09), transparent 70%); }
+  ::selection { background: var(--g); color: var(--bg); }
+  .x-w { max-width: 980px; margin: 0 auto; padding: calc(var(--panel-h, 330px) + 36px) 22px 40px; }
+  .x-top { position: fixed; top: 0; left: 0; right: 0; height: calc(32px * var(--s, 1)); display: flex; justify-content: space-between; align-items: center; padding: 0 18px; font-size: 12.5px; color: var(--dim); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .x-top a { color: var(--fg); text-decoration: none; margin-left: 16px; } .x-top a:hover { color: var(--g); }
+  .x-top .x-buy { color: var(--bg); background: var(--g); padding: 1px 9px; border-radius: 3px; }
+
+  h1 { font-size: clamp(30px, 4.6vw, 52px); line-height: 1.08; font-weight: 800; margin: 0 0 18px; letter-spacing: -.03em; color: #fff; }
+  h1 em { font-style: normal; color: var(--g); }
+  .x-cursor { display: inline-block; width: .55em; height: .95em; background: var(--g); vertical-align: -.1em; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .x-lede { color: var(--fg); max-width: 46em; margin: 0 0 26px; }
+  .x-lede b { color: var(--a); font-weight: 500; }
+
+  .x-term { border: 1px solid var(--line); border-radius: 10px; background: var(--bg2); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .8); overflow: hidden; }
+  .x-term-h { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--dim); font-size: 12.5px; }
+  .x-term-h i { width: 11px; height: 11px; border-radius: 50%; background: #2a3458; }
+  .x-term-h span { margin-left: 8px; }
+  .x-out { padding: 14px 18px 4px; height: 270px; overflow: auto; }
+  .x-out div { white-space: pre-wrap; }
+  .x-out .c { color: var(--fg); } .x-out .c::before { content: "~ $ "; color: var(--g); }
+  .x-out .o { color: var(--dim); } .x-out .k { color: var(--a); } .x-out .ok { color: var(--g); } .x-out .err { color: var(--p); }
+  .x-in { display: flex; align-items: center; gap: 8px; padding: 6px 18px 16px; }
+  .x-in label { color: var(--g); }
+  .x-in input { flex: 1; background: none; border: 0; outline: none; color: #fff; font: inherit; caret-color: var(--g); }
+  .x-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+  .x-chips button { font: inherit; font-size: 13px; color: var(--fg); background: none; border: 1px dashed var(--line); border-radius: 5px; padding: 4px 10px; cursor: pointer; }
+  .x-chips button:hover { border-color: var(--g); color: var(--g); }
+
+  .x-h2 { color: var(--a); margin: 70px 0 16px; font-weight: 700; font-size: 15px; }
+  .x-h2::before { content: "## "; color: var(--dim); }
+  .x-man { display: grid; grid-template-columns: 210px 1fr; gap: 6px 26px; }
+  .x-man dt { color: var(--g); } .x-man dt button { all: unset; cursor: pointer; } .x-man dt button:hover { text-decoration: underline; }
+  .x-man dd { margin: 0; color: var(--fg); }
+  .x-spec { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 8px; }
+  .x-spec div { padding: 16px; border-left: 1px solid var(--line); } .x-spec div:first-child { border-left: 0; }
+  .x-spec b { display: block; color: #fff; font-size: 22px; } .x-spec span { color: var(--dim); font-size: 13px; }
+  .x-price { border: 1px solid var(--g); border-radius: 10px; padding: 26px 28px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; background: rgba(109, 255, 176, .04); }
+  .x-price b { color: #fff; font-size: 44px; font-weight: 800; letter-spacing: -.03em; } .x-price s { color: var(--dim); margin-left: 8px; }
+  .x-price p { margin: 6px 0 0; color: var(--dim); }
+  .x-btn { display: inline-block; background: var(--g); color: var(--bg); font-weight: 800; padding: 13px 20px; border-radius: 6px; text-decoration: none; }
+  .x-btn:hover { background: #fff; }
+  .x-faq details { border-bottom: 1px dashed var(--line); padding: 10px 0; }
+  .x-faq summary { cursor: pointer; color: #fff; list-style: none; } .x-faq summary::before { content: "? "; color: var(--a); }
+  .x-faq p { margin: 6px 0 0 18px; color: var(--dim); }
+  .x-foot { margin-top: 60px; color: var(--dim); font-size: 13px; } .x-foot a { color: var(--fg); }
+  @media (max-width: 760px) { .x-man { grid-template-columns: 1fr; } .x-man dd { margin-bottom: 10px; } .x-spec { grid-template-columns: 1fr 1fr; } .x-spec div:nth-child(3) { border-left: 0; } .x-price { grid-template-columns: 1fr; } .x-top nav a:not(.x-buy) { display: none; } }
+</style>
+</head>
+<body>
+<header class="x-top"><span>visorpro — zsh</span><nav><a href="#man">man</a><a href="#price">price</a><a class="x-buy" href="checkout.html">buy <span data-price></span></a></nav></header>
+<main class="x-w">
+  <h1>The notch is now a <em>command line</em> for your day.<span class="x-cursor"></span></h1>
+  <p class="x-lede">VisorPro drops a panel out of your MacBook’s notch: clipboard history, calendar, reminders, music, timers, a calculator and the <b>menu bar icons the notch hides</b>. Point at it, or press <b>⌃⌥⌘M</b>, or type below. It all drives the real panel up there.</p>
+
+  <div class="x-term" data-vp-keep>
+    <div class="x-term-h"><i></i><i></i><i></i><span>try-visorpro — type “help”</span></div>
+    <div class="x-out" id="out"></div>
+    <form class="x-in" id="form" autocomplete="off"><label for="cmd">~ $</label><input id="cmd" spellcheck="false" aria-label="Command" placeholder="open clipboard"></form>
+  </div>
+  <div class="x-chips" id="chips"></div>
+
+  <h2 class="x-h2" id="man">man visorpro</h2>
+  <dl class="x-man">
+    <dt><button data-open-tab="clipboard">clipboard</button></dt><dd>Every copy, kept on your Mac. Text, links, colours, images, files. Passwords skipped.</dd>
+    <dt><button data-open-tab="menubar">menubar</button></dt><dd>The icons the notch hides, with their menus one click away.</dd>
+    <dt><button data-open-tab="calendar">calendar</button></dt><dd>Up next with a countdown and Join. Day, week and month.</dd>
+    <dt><button data-open-tab="tasks">reminders</button></dt><dd>Your lists, synced with your iPhone. “call mum tomorrow 6pm” gets a date.</dd>
+    <dt><button data-open-tab="clock">clock</button></dt><dd>Pomodoro, named timers, stopwatch, alarms.</dd>
+    <dt><button data-open-tab="calculator">calculator</button></dt><dd>Sums, units and currencies, as you type.</dd>
+    <dt><button data-open-tab="shortcuts">shortcuts</button></dt><dd>Apps, key combos, shell scripts and window layouts on one click.</dd>
+    <dt><button data-open-search>⌘K</button></dt><dd>Search all of it. Type “10m tea” and a timer starts.</dd>
+  </dl>
+
+  <h2 class="x-h2">uname -a</h2>
+  <div class="x-spec"><div><b>0%</b><span>CPU while folded away</span></div><div><b>0</b><span>accounts, trackers</span></div><div><b>13</b><span>tabs, hide any</span></div><div><b>13+</b><span>macOS, arm64 &amp; x86</span></div></div>
+
+  <h2 class="x-h2" id="price">price</h2>
+  <div class="x-price"><div><b data-price></b><s data-price-was></s><p>one-time · <span data-macs></span> Macs · <span data-trial></span>-day trial · refunds within 14 days</p></div><a class="x-btn" href="checkout.html">./buy</a></div>
+
+  <h2 class="x-h2">faq</h2>
+  <div class="x-faq" data-faq="6"></div>
+  <p class="x-foot"># VisorPro · Mac Utilities Suite · <a href="mailto:hello@visorpro.app">hello@visorpro.app</a></p>
+</main>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount({ accent: '#6dffb0', look: 'studio' });
+  VP.kit.fill();
+  const out = document.getElementById('out'), cmd = document.getElementById('cmd');
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const print = (text, cls = 'o') => { const d = document.createElement('div'); d.className = cls; d.innerHTML = text; out.appendChild(d); out.scrollTop = out.scrollHeight; };
+  const TABS = { widgets: 'widgets', clipboard: 'clipboard', captures: 'captures', shelf: 'shelf', shortcuts: 'shortcuts', calendar: 'calendar', reminders: 'tasks', tasks: 'tasks', notes: 'notes', music: 'player', player: 'player', translate: 'translate', calculator: 'calculator', calc: 'calculator', clock: 'clock', pomodoro: 'clock', menubar: 'menubar', 'menu bar': 'menubar' };
+  const LOOKS = ['studio', 'liquid', 'tinted', 'fade'];
+  function run(line) {
+    const l = line.trim(); if (!l) return;
+    print(esc(l), 'c');
+    const [w, ...rest] = l.split(/\s+/); const arg = rest.join(' ').toLowerCase();
+    switch (w.toLowerCase()) {
+      case 'help': print(`<span class="k">open</span> &lt;tab&gt;     clipboard, calendar, reminders, music, clock, menubar, shelf, notes…
+<span class="k">search</span> &lt;text&gt;   anything; try “10m tea” or “5 km to mi”
+<span class="k">calc</span> &lt;sum&gt;      2^10, 1240*0.21, 100 usd to eur
+<span class="k">look</span> &lt;name&gt;     studio, liquid, tinted, fade
+<span class="k">pin</span> / <span class="k">close</span>    keep it open, or fold it away
+<span class="k">price</span> · <span class="k">buy</span> · <span class="k">clear</span>`); break;
+      case 'open': { const t = TABS[arg] || (arg ? null : 'widgets'); if (!t) { print(`no tab called “${esc(arg)}”. try: ${Object.keys(TABS).slice(0, 8).join(', ')}`, 'err'); break; } VP.demo.setTab(t); print(`opened ${t === 'tasks' ? 'reminders' : t} ↑`, 'ok'); break; }
+      case 'search': VP.demo.search(rest.join(' ')); print('searching in the panel ↑', 'ok'); break;
+      case 'calc': { const r = VP.demo.calc(rest.join(' ')); if (r == null) { print('can’t work that out. try 2^10, 1240*0.21, 5 km to mi, 100 usd to eur', 'err'); break; } print('= ' + esc(r), 'k'); VP.demo.setTab('calculator'); break; }
+      case 'look': if (!LOOKS.includes(arg)) { print('looks: ' + LOOKS.join(', '), 'err'); break; } VP.demo.setLook(arg); VP.demo.open(); print(`look → ${arg}`, 'ok'); break;
+      case 'pin': VP.demo.open(); VP.demo.pin(true); print('pinned open. “close” or “unpin” to let it go.', 'ok'); break;
+      case 'unpin': VP.demo.pin(false); print('unpinned', 'ok'); break;
+      case 'close': VP.demo.pin(false); VP.demo.close(); print('folded away. point at the notch to bring it back.', 'ok'); break;
+      case 'price': print(`${VP.money(VP.pricing.early)} once (was ${VP.money(VP.pricing.regular)}) · ${VP.pricing.macs} Macs · ${VP.pricing.trialDays}-day trial`, 'k'); break;
+      case 'buy': case './buy': print('opening checkout…', 'ok'); setTimeout(() => { location.href = 'checkout.html'; }, 500); break;
+      case 'clear': out.innerHTML = ''; break;
+      case 'sudo': print('no need. it never asks for your password.', 'k'); break;
+      case 'ls': print('clipboard  calendar  reminders  music  clock  menubar  shelf  notes  translate  calculator  shortcuts  captures  widgets'); break;
+      default: print(`command not found: ${esc(w)} · type “help”`, 'err');
+    }
+  }
+  // The panel's search takes the keyboard when it opens; hand it back so the next command lands here.
+  const refocus = () => setTimeout(() => cmd.focus({ preventScroll: true }), 30);
+  document.getElementById('form').addEventListener('submit', (e) => { e.preventDefault(); const w = cmd.value.trim().split(/\s+/)[0]; run(cmd.value); cmd.value = ''; if (w !== 'search') refocus(); });
+  const CHIPS = ['open clipboard', 'search 10m tea', 'calc 100 usd to eur', 'calc 5 km to mi', 'look liquid', 'open menubar', 'pin', 'price'];
+  document.getElementById('chips').innerHTML = CHIPS.map((c) => `<button data-vp-keep data-run="${c}">${c}</button>`).join('');
+  document.getElementById('chips').addEventListener('click', (e) => { const b = e.target.closest('[data-run]'); if (b) { run(b.dataset.run); if (!/^search/.test(b.dataset.run)) refocus(); } });
+  print('Last login: today on ttys001');
+  print('VisorPro is running. The panel above is live. Type <span class="k">help</span>, or point at the notch.');
+  VP.kit.autoOpen(700);
+</script>
+</body>
+</html>

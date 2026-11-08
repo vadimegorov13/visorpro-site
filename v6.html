@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 6 · 60-second tour</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 6 · 60-second tour: a little game. Five things to do in the real panel; each one ticks itself off when you
+     do it. Finish and the page says: you already know how to use it. Soft lavender and violet. */
+  :root { --bg: #e9e4ff; --ink: #1e1446; --ink2: #5a5185; --v: #6a3df5; --v2: #b49bff; --card: #f7f5ff; --ok: #12b886; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 "Space Grotesk", system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(50% 60% at 100% 0%, #d6c9ff, transparent 70%), radial-gradient(40% 50% at 0% 100%, #ffd6ec, transparent 70%); min-height: 100vh; }
+  .x-w { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+  .x-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; font-weight: 700; font-size: 18px; }
+  .x-nav > span { display: flex; gap: 10px; align-items: center; }
+  .x-nav a { color: var(--ink); text-decoration: none; }
+  .x-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 14px; background: var(--v); color: #fff !important; font-weight: 600; text-decoration: none; box-shadow: 0 10px 24px -10px var(--v); border: 0; font-family: inherit; font-size: 15.5px; cursor: pointer; }
+  .x-btn.sm { padding: 8px 14px; font-size: 14px; border-radius: 11px; }
+  .x-btn.g { background: rgba(106, 61, 245, .1); color: var(--v) !important; box-shadow: none; }
+  .x-btn s { opacity: .7; font-weight: 400; }
+
+  .x-play { display: grid; grid-template-columns: 380px 1fr; gap: 34px; align-items: start; padding: 10px 0 40px; }
+  .x-side h1 { font: 700 44px/1.02 "Space Grotesk"; letter-spacing: -.035em; margin: 6px 0 12px; }
+  .x-side h1 span { color: var(--v); }
+  .x-side > p { color: var(--ink2); margin: 0 0 22px; }
+  .x-prog { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; font-weight: 600; }
+  .x-prog .bar { flex: 1; height: 10px; border-radius: 6px; background: rgba(106, 61, 245, .14); overflow: hidden; }
+  .x-prog .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--v), #ff6fae); border-radius: 6px; transition: width .5s cubic-bezier(.2, .9, .3, 1.2); }
+  .x-tasks { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .x-task { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 16px; background: var(--card); border: 1.5px solid transparent; transition: .25s; }
+  .x-task.now { border-color: var(--v2); box-shadow: 0 10px 24px -14px var(--v); }
+  .x-task .box { width: 30px; height: 30px; border-radius: 10px; border: 2px solid var(--v2); display: grid; place-items: center; color: #fff; font-weight: 700; transition: .25s; }
+  .x-task.done .box { background: var(--ok); border-color: var(--ok); transform: scale(1.08) rotate(-6deg); }
+  .x-task.done { opacity: .62; } .x-task.done b { text-decoration: line-through; }
+  .x-task b { display: block; } .x-task small { color: var(--ink2); font-size: 13.5px; }
+  .x-skip { margin-top: 14px; font-size: 14px; color: var(--ink2); }
+  .x-skip a { color: var(--v); }
+
+  .x-stage { position: relative; }
+  .x-screen { position: relative; aspect-ratio: 16 / 10.4; border-radius: 22px; overflow: hidden; box-shadow: 0 0 0 10px #17112e, 0 0 0 11px #3a3160, 0 40px 80px -30px rgba(40, 20, 100, .55);
+    background: radial-gradient(60% 70% at 25% 100%, #ff9ccd, transparent 60%), radial-gradient(60% 70% at 90% 90%, #8b6cff, transparent 60%), linear-gradient(#3a2b8f, #c79cf0); margin-top: 11px; }
+  .x-mb { position: absolute; top: 0; left: 0; right: 0; height: 26px; display: flex; justify-content: space-between; padding: 0 14px; align-items: center; color: #fff; font: 500 12px -apple-system, sans-serif; background: rgba(0, 0, 0, .14); }
+  .x-pulse { position: absolute; top: 4px; left: 50%; width: 220px; height: 40px; margin-left: -110px; border-radius: 0 0 20px 20px; pointer-events: none; z-index: 1; box-shadow: 0 0 0 0 rgba(255, 255, 255, .7); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(255, 255, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); } }
+  .x-hint { position: absolute; top: 46px; left: 50%; transform: translateX(-50%); color: #fff; font-weight: 600; background: rgba(30, 20, 70, .55); padding: 6px 14px; border-radius: 999px; font-size: 14px; white-space: nowrap; z-index: 1; }
+  .x-stage.opened .x-pulse, .x-stage.opened .x-hint { display: none; }
+
+  .x-win { display: none; margin-top: 18px; padding: 22px 24px; border-radius: 20px; background: linear-gradient(120deg, #1e1446, #4b2bb5); color: #fff; }
+  .x-win.on { display: block; animation: pop .5s cubic-bezier(.2, .9, .3, 1.3); }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } }
+  .x-win h2 { margin: 0 0 6px; font-size: 26px; letter-spacing: -.02em; }
+  .x-win p { margin: 0 0 16px; color: rgba(255, 255, 255, .75); }
+  .x-win .x-btn { background: #fff; color: var(--v) !important; }
+
+  .x-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 40px 0; }
+  .x-strip div { background: var(--card); border-radius: 18px; padding: 20px; }
+  .x-strip b { display: block; font-size: 17px; margin-bottom: 4px; } .x-strip span { color: var(--ink2); font-size: 14.5px; }
+  .x-bottom { display: grid; grid-template-columns: 1fr 1.3fr; gap: 30px; margin-bottom: 60px; }
+  .x-price { background: var(--ink); color: #fff; border-radius: 24px; padding: 30px; }
+  .x-price b { font-size: 60px; letter-spacing: -.04em; line-height: 1; } .x-price s { opacity: .5; margin-left: 8px; }
+  .x-price p { color: rgba(255, 255, 255, .7); margin: 8px 0 20px; }
+  .x-faq details { background: var(--card); border-radius: 14px; padding: 14px 18px; margin-bottom: 8px; }
+  .x-faq summary { cursor: pointer; font-weight: 600; }
+  .x-faq p { margin: 8px 0 0; color: var(--ink2); }
+  .x-foot { text-align: center; color: var(--ink2); padding: 0 0 40px; font-size: 14px; } .x-foot a { color: inherit; }
+  @media (max-width: 1000px) { .x-play, .x-bottom { grid-template-columns: 1fr; } .x-stage { order: -1; } .x-strip { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="x-w">
+  <header class="x-nav"><span><span data-mark="28"></span>VisorPro</span><a class="x-btn sm" href="checkout.html">Buy · <span data-price></span></a></header>
+
+  <section class="x-play">
+    <div class="x-side">
+      <h1>Learn VisorPro in <span>60 seconds.</span></h1>
+      <p>The Mac on the right is running the real panel. Do these five things and you’ll know everything you need.</p>
+      <div class="x-prog"><span id="count">0 / 5</span><div class="bar"><i id="bar"></i></div></div>
+      <ol class="x-tasks" id="tasks">
+        <li class="x-task now" data-k="open"><span class="box"></span><span><b>Point at the notch</b><small>Just move the pointer to the black notch. No click needed.</small></span></li>
+        <li class="x-task" data-k="slide"><span class="box"></span><span><b>Slide down to Calendar</b><small>Glide over the icons on the left. Tabs switch as you pass.</small></span></li>
+        <li class="x-task" data-k="copy"><span class="box"></span><span><b>Copy something old</b><small>In Clipboard, click anything you “copied” earlier.</small></span></li>
+        <li class="x-task" data-k="tick"><span class="box"></span><span><b>Tick off a reminder</b><small>In Reminders, click a circle.</small></span></li>
+        <li class="x-task" data-k="timer"><span class="box"></span><span><b>Type “10m tea” in search</b><small>Click the magnifier, or press ⌘K. Then Enter.</small></span></li>
+      </ol>
+      <p class="x-skip">Rather not play? <a href="checkout.html">Buy it for <span data-price></span></a> or <a href="#price">see the price</a>.</p>
+      <div class="x-win" id="win"><h2>That’s all of it. 🎉</h2><p>You just used VisorPro. On your Mac it lives in the notch and opens the same way.</p><a class="x-btn" href="checkout.html">Get it for <span data-price></span> <s data-price-was></s></a></div>
+    </div>
+    <div class="x-stage" id="stage">
+      <div class="x-screen" id="screen">
+        <div class="x-mb"><span><b>Finder</b>&nbsp;&nbsp;File&nbsp;&nbsp;Edit&nbsp;&nbsp;View</span><span id="clk"></span></div>
+        <div class="x-pulse"></div><div class="x-hint">↑ point at the notch</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="x-strip">
+    <div><b>Opens five ways</b><span>Point, click, ⌃⌥⌘M, drag a file up, or scroll at the top edge.</span></div>
+    <div><b>13 tabs</b><span>Keep the ones you use, hide the rest, put the bar on any side.</span></div>
+    <div><b>Invisible on calls</b><span>Never shows when you share or record your screen.</span></div>
+    <div><b>Stays on your Mac</b><span>No account. Passwords never recorded.</span></div>
+  </section>
+
+  <section class="x-bottom" id="price">
+    <div class="x-price"><b data-price></b><s data-price-was></s><p>Once, not monthly. <span data-macs></span> Macs. <span data-trial></span>-day free trial. Refunds within 14 days.</p><a class="x-btn" href="checkout.html">Buy VisorPro</a> <a class="x-btn g" href="#" style="background:rgba(255,255,255,.12);color:#fff!important">Free trial</a></div>
+    <div class="x-faq" data-faq="5"></div>
+  </section>
+  <footer class="x-foot"><a href="mailto:hello@visorpro.app">hello@visorpro.app</a> · Mac Utilities Suite</footer>
+</div>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount({ host: document.getElementById('screen'), fit: .78, max: 1.15, min: .5, margin: 0, accent: '#8b6cff' });
+  VP.kit.fill();
+  const clk = () => { document.getElementById('clk').textContent = new Date().toLocaleTimeString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }); };
+  clk(); setInterval(clk, 15000);
+
+  const done = new Set(), order = ['open', 'slide', 'copy', 'tick', 'timer'];
+  function mark(k) {
+    if (done.has(k)) return; done.add(k);
+    document.querySelectorAll('.x-task').forEach((t) => {
+      t.classList.toggle('done', done.has(t.dataset.k));
+      if (done.has(t.dataset.k)) t.querySelector('.box').textContent = '✓';
+    });
+    const next = order.find((o) => !done.has(o));
+    document.querySelectorAll('.x-task').forEach((t) => t.classList.toggle('now', t.dataset.k === next));
+    document.getElementById('count').textContent = `${done.size} / 5`;
+    document.getElementById('bar').style.width = (done.size / 5 * 100) + '%';
+    if (done.size === 5) document.getElementById('win').classList.add('on');
+  }
+  addEventListener('vp:open', () => { mark('open'); document.getElementById('stage').classList.add('opened'); });
+  addEventListener('vp:tab', (e) => { if (e.detail.tab === 'calendar') mark('slide'); });
+  addEventListener('vp:say', (e) => {
+    const t = e.detail.text;
+    if (/^Copied/.test(t)) mark('copy');
+    if (t === 'Ticked off') mark('tick');
+    if (/Timer started|tea/i.test(t)) mark('timer');
+  });
+</script>
+</body>
+</html>

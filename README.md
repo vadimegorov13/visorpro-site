@@ -3,7 +3,7 @@
 One landing page and a **demo** checkout. Plain HTML, CSS and JavaScript: no build step, no dependencies. Not part of the app and not built by `make`.
 
 ```sh
-cd website && python3 -m http.server 8000   # then http://127.0.0.1:8000
+python3 -m http.server 8000   # then http://127.0.0.1:8000
 ```
 
 ## The page, top to bottom
@@ -26,6 +26,9 @@ cd website && python3 -m http.server 8000   # then http://127.0.0.1:8000
 | `assets/site.js`, `assets/site.css` | Navigation, footer, page styles |
 | `assets/apps/*.png` | macOS app icons rendered from this Mac |
 | `checkout.html` | Demo checkout; codes `NOTCH20`, `EARLYBIRD`; test card `4242 4242 4242 4242`. Nothing typed leaves the page |
+| `assets/shots/*.webp` | The app's own pictures used in the feature rows and the preview |
+| `variants.html`, `v1.html` … `v12.html` (+ `assets/vkit.js`, `demo.js`, `demo.css`) | Design directions for a new landing page, each with a working panel (`VP.demo.mount({ host })`); not linked from the main page |
+| `assets/landing.js`, `assets/landing.css` | The dark Nov 7 landing page (menu bar with the notch, working panel); no longer loaded |
 
 ## Placeholders to replace before going live
 

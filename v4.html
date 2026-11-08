@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VisorPro — 4 · Loud</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/demo.css">
+<style>
+  /* 4 · Loud: electric yellow, heavy black type, thick borders, hard shadows and stickers. Short and shouty. */
+  :root { --y: #ffe14a; --k: #111; --p: #ff3d8b; --b: #3d5afe; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--y); color: var(--k); font: 500 18px/1.45 "Space Grotesk", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  .x-w { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  .x-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; font-weight: 700; }
+  .x-top a { color: var(--k); text-decoration: none; }
+  .x-logo { font: 26px "Archivo Black", sans-serif; letter-spacing: -.03em; }
+  .x-b { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; background: var(--k); color: var(--y) !important; font: 20px "Archivo Black", sans-serif; text-decoration: none; border: 3px solid var(--k); box-shadow: 6px 6px 0 var(--p); transition: transform .1s, box-shadow .1s; cursor: pointer; }
+  .x-b:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--p); }
+  .x-b:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--p); }
+  .x-b.sm { font-size: 15px; padding: 8px 14px; box-shadow: 4px 4px 0 var(--p); }
+  .x-b.w { background: #fff; color: var(--k) !important; box-shadow: 6px 6px 0 var(--k); }
+
+  .x-hero { position: relative; padding: calc(var(--panel-h, 330px) + 30px) 0 50px; text-align: center; }
+  .x-arrow { position: absolute; top: calc(var(--panel-h, 330px) - 18px); left: calc(50% + 330px * var(--s, 1) - 10px); font: 22px "Archivo Black"; transform: rotate(-8deg); white-space: nowrap; }
+  .x-arrow::before { content: "↖ "; }
+  @media (max-width: 1100px) { .x-arrow { display: none; } }
+  .x-hero h1 { font: clamp(46px, 15vw, 230px)/.82 "Archivo Black", sans-serif; letter-spacing: -.055em; margin: 0; text-transform: uppercase; }
+  .x-hero h1 span { display: inline-block; background: var(--k); color: var(--y); padding: 0 .08em; transform: rotate(-2deg); }
+  .x-hero p { font-size: 24px; max-width: 30em; margin: 30px auto 34px; font-weight: 500; }
+  .x-hero p b { background: #fff; padding: 0 6px; border: 2px solid var(--k); }
+  .x-ctas { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; }
+  .x-stk { position: absolute; font: 18px/1.05 "Archivo Black"; text-transform: uppercase; padding: 14px 16px; border: 3px solid var(--k); box-shadow: 5px 5px 0 var(--k); text-align: center; }
+  .x-stk.a { left: 4%; top: calc(var(--panel-h, 330px) + 210px); background: var(--p); color: #fff; transform: rotate(-9deg); }
+  .x-stk.b { right: 4%; top: calc(var(--panel-h, 330px) + 250px); background: #fff; transform: rotate(7deg); border-radius: 50%; width: 140px; height: 140px; display: grid; place-items: center; }
+  @media (max-width: 1000px) { .x-stk { display: none; } }
+
+  .x-tick { border-block: 3px solid var(--k); background: var(--k); color: var(--y); overflow: hidden; white-space: nowrap; font: 26px/1 "Archivo Black"; text-transform: uppercase; }
+  .x-tick div { display: inline-block; padding: 14px 0; animation: tick 30s linear infinite; }
+  .x-tick span { margin: 0 22px; } .x-tick span:nth-child(even) { color: var(--p); }
+  @keyframes tick { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .x-tick div { animation: none; } }
+
+  .x-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; padding: 70px 0; }
+  .x-c { border: 3px solid var(--k); background: #fff; padding: 24px; text-align: left; font: inherit; color: inherit; cursor: pointer; box-shadow: 8px 8px 0 var(--k); transition: transform .1s, box-shadow .1s; display: flex; flex-direction: column; gap: 10px; }
+  .x-c:hover { transform: translate(-3px, -3px) rotate(-.6deg); box-shadow: 11px 11px 0 var(--k); }
+  .x-c:nth-child(2) { background: var(--p); color: #fff; } .x-c:nth-child(4) { background: var(--b); color: #fff; } .x-c:nth-child(6) { background: var(--k); color: var(--y); }
+  .x-c .i { width: 40px; height: 40px; display: block; }
+  .x-c h3 { font: 30px/1 "Archivo Black"; text-transform: uppercase; margin: 6px 0 0; letter-spacing: -.02em; }
+  .x-c p { margin: 0; font-size: 16.5px; }
+  .x-c u { text-decoration: none; font-weight: 700; margin-top: auto; }
+
+  .x-price { border: 3px solid var(--k); background: #fff; box-shadow: 12px 12px 0 var(--k); display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 70px; }
+  .x-price > div { padding: 40px; }
+  .x-price > div + div { border-left: 3px solid var(--k); background: var(--p); color: #fff; display: grid; align-content: center; justify-items: start; gap: 18px; }
+  .x-price h2 { font: clamp(44px, 6vw, 76px)/.9 "Archivo Black"; text-transform: uppercase; margin: 0 0 20px; letter-spacing: -.04em; }
+  .x-price ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-weight: 700; }
+  .x-price li::before { content: "■ "; color: var(--p); }
+  .x-amt { font: clamp(80px, 10vw, 140px)/.8 "Archivo Black"; letter-spacing: -.05em; }
+  .x-amt s { font-size: .3em; opacity: .7; margin-left: 10px; vertical-align: top; }
+  .x-faq { padding-bottom: 60px; }
+  .x-faq h2 { font: 54px "Archivo Black"; text-transform: uppercase; margin: 0 0 20px; }
+  .x-faq [data-faq] { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .x-faq details { border: 3px solid var(--k); background: #fff; padding: 14px 18px; }
+  .x-faq summary { cursor: pointer; font-weight: 700; }
+  .x-faq p { margin: 8px 0 0; font-size: 16px; }
+  .x-foot { border-top: 3px solid var(--k); padding: 22px 24px; display: flex; justify-content: space-between; font-weight: 700; }
+  .x-foot a { color: inherit; }
+  @media (max-width: 860px) {
+    .x-grid, .x-price, .x-faq [data-faq] { grid-template-columns: 1fr; }
+    .x-price > div + div { border-left: 0; border-top: 3px solid var(--k); }
+    .x-price > div { padding: 26px 22px; min-width: 0; } .x-amt { font-size: 72px; }
+    .x-faq h2 { font-size: 38px; }
+    .x-hero p { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+<header class="x-top"><a class="x-logo" href="#">VISORPRO</a><a class="x-b sm" href="checkout.html">BUY <span data-price></span></a></header>
+<div class="x-w">
+  <section class="x-hero">
+    <span class="x-arrow">THAT’S LIVE. POINT AT IT.</span>
+    <div class="x-stk a">No<br>subscription!</div>
+    <div class="x-stk b">Only<br><span data-price></span></div>
+    <h1>Your notch<br><span>works now.</span></h1>
+    <p>Clipboard, calendar, reminders, music, timers and the <b>menu bar icons it was hiding</b>. Point at the notch: they drop. Move away: gone.</p>
+    <div class="x-ctas"><a class="x-b" href="checkout.html">BUY · <span data-price></span></a><button class="x-b w" data-open-search>TRY ⌘K SEARCH</button></div>
+  </section>
+</div>
+<div class="x-tick" aria-hidden="true"><div>
+  <span>Clipboard history</span><span>Calendar + Join</span><span>Reminders</span><span>Now playing</span><span>Pomodoro</span><span>Hidden icons</span><span>Shelf</span><span>Calculator</span><span>Translate</span><span>Notes</span><span>Shortcuts</span><span>Widgets</span>
+  <span>Clipboard history</span><span>Calendar + Join</span><span>Reminders</span><span>Now playing</span><span>Pomodoro</span><span>Hidden icons</span><span>Shelf</span><span>Calculator</span><span>Translate</span><span>Notes</span><span>Shortcuts</span><span>Widgets</span>
+</div></div>
+<div class="x-w">
+  <section class="x-grid">
+    <button class="x-c" data-open-tab="clipboard"><span data-i="clipboard"></span><h3>Copied it? Kept it.</h3><p>Every copy on your Mac. Passwords skipped.</p><u>CLICK → OPENS IT ↑</u></button>
+    <button class="x-c" data-open-tab="menubar"><span data-i="menubar"></span><h3>Icons: rescued.</h3><p>The ones hiding behind the camera, one click from their menus.</p><u>CLICK → OPENS IT ↑</u></button>
+    <button class="x-c" data-open-tab="calendar"><span data-i="calendar"></span><h3>Call in 2 min.</h3><p>Countdown and a Join button, over any app.</p><u>CLICK → OPENS IT ↑</u></button>
+    <button class="x-c" data-open-tab="tasks"><span data-i="checklist"></span><h3>Tick. Tick. Done.</h3><p>Your Reminders, synced with your iPhone.</p><u>CLICK → OPENS IT ↑</u></button>
+    <button class="x-c" data-open-tab="player"><span data-i="player"></span><h3>Pause. Anywhere.</h3><p>Music, Spotify, YouTube in the browser.</p><u>CLICK → OPENS IT ↑</u></button>
+    <button class="x-c" data-open-tab="clock"><span data-i="clock"></span><h3>25 min. Go.</h3><p>Pomodoro, timers, stopwatch, alarms.</p><u>CLICK → OPENS IT ↑</u></button>
+  </section>
+  <section class="x-price" id="price">
+    <div><h2>Pay once.<br>Done.</h2><ul><li>All 13 tabs + 4 looks</li><li>Every v1 update</li><li><span data-macs></span> Macs</li><li><span data-trial></span>-day free trial</li><li>Nothing leaves your Mac</li></ul></div>
+    <div><div class="x-amt"><span data-price></span><s data-price-was></s></div><a class="x-b w" href="checkout.html">BUY VISORPRO →</a><span>Refunds within 14 days. No questions.</span></div>
+  </section>
+  <section class="x-faq"><h2>Questions?</h2><div data-faq="6"></div></section>
+</div>
+<footer class="x-foot"><span>VISORPRO · MAC UTILITIES SUITE</span><a href="mailto:hello@visorpro.app">hello@visorpro.app</a></footer>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/vkit.js"></script>
+<script>
+  VP.demo.mount({ accent: '#ff3d8b' });
+  VP.kit.fill();
+  VP.kit.autoOpen(600);
+</script>
+</body>
+</html>

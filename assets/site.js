@@ -31,7 +31,7 @@
         <form class="news" onsubmit="event.preventDefault();this.querySelector('button').textContent='Subscribed';"><input type="email" placeholder="you@email.com" aria-label="Email for updates"><button>Get updates</button></form>
       </div>
       ${col('Product', [['Features', `${home}#features`], ['How it opens', `${home}#ways`], ['Try it', `${home}#try`], ['Looks', `${home}#looks`], ['Pricing', `${home}#pricing`], ['Download'], ['Changelog']])}
-      ${col('Tabs', [['Widgets'], ['Clipboard'], ['Calendar'], ['Player'], ['Menu Bar'], [`All 13 →`, `${home}#tabs`]])}
+      ${col('Tabs', [['Widgets'], ['Clipboard'], ['Calendar'], ['Player'], ['Menu Bar'], [`All ${VP.inside.length} →`, `${home}#tabs`]])}
       ${col('Help', [['FAQ', `${home}#faq`], ['Keyboard shortcuts'], ['Permissions'], ['Restore a licence'], ['Contact'], ['Press kit']])}
       ${col('Guides', [['Compare', `${home}#compare`], ['See hidden menu bar icons'], ['Clipboard history on Mac'], ['Make the notch useful'], ['Snap windows on Mac']])}
       ${col('Legal', [['Privacy'], ['Terms'], ['Refunds'], ['Licence'], ['Cookies (there are none)']])}
@@ -46,6 +46,7 @@
   const f = document.getElementById('site-footer'); if (f) f.outerHTML = footer;
 
   document.querySelectorAll('[data-price]').forEach(e => { e.textContent = VP.money(VP.pricing[e.dataset.price]) });
+  document.querySelectorAll('[data-count]').forEach(e => { e.textContent = VP.inside.length });
   document.querySelectorAll('[data-trial]').forEach(e => { e.textContent = VP.pricing.trialDays });
   document.querySelectorAll('[data-icon]').forEach(e => { e.insertAdjacentHTML('afterbegin', I(e.dataset.icon)) });
 })();
