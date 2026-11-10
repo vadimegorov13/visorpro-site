@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VisorPro's update feed, read by the app (Sparkle) once a day. Made by visorpro's
+     Scripts/dist.sh: don't edit releases by hand, their signatures must match the DMGs. -->
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>VisorPro</title>
+    <link>https://raw.githubusercontent.com/vadimegorov13/visorpro-site/main/appcast.xml</link>
+    <description>Updates for VisorPro</description>
+    <language>en</language>
+<!-- releases: newest first; Scripts/appcast.py adds them here -->
+  </channel>
+</rss>
